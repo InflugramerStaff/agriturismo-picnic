@@ -1,0 +1,1746 @@
+            apiKey: "TUA_API_KEY",
+            authDomain: "TUO_AUTH_DOMAIN",
+            databaseURL: "https://picnic-4467e-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "TUO_PROJECT_ID",
+            storageBucket: "TUO_STORAGE_BUCKET",
+            messagingSenderId: "TUO_MESSAGING_SENDER_ID",
+            appId: "TUO_APP_ID"
+        };
+
+        // Inizializza Firebase
+        const app = initializeApp(firebaseConfig);
+        
+        // Inizializza Realtime Database
+        const database = getDatabase(app);
+        
+        // Credenziali amministratore (in un ambiente di produzione, sarebbero memorizzate in modo più sicuro)
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'admin123';
+        
+        // Variabili globali
+        let products = [];
+        let orders = [];
+        let locations = [];
+        let currentOrdersFilter = 'all';
+        let currentProductsFilter = 'all';
+        let categories = [];
+        
+        // Funzione di login
+        window.login = function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginError = document.getElementById('loginError');
+            
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadDashboardData();
+            } else {
+                loginError.textContent = 'Username o password non validi';
+                loginError.style.display = 'block';
+            }
+        };
+        
+        // Funzione di logout
+        window.logout = function() {
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        };
+        
+        // Funzione per mostrare una pagina del dashboard
+        window.showPage = function(pageId) {
+            // Nascondi tutte le pagine
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Mostra la pagina selezionata
+            document.getElementById(pageId).classList.add('active');
+            
+            // Aggiorna la classe active nel menu
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+                
+                if (link.getAttribute('onclick').includes(pageId)) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Carica i dati in base alla pagina selezionata
+            if (pageId === 'dashboard-page') {
+                loadDashboardData();
+            } else if (pageId === 'orders-page') {
+                loadOrders();
+            } else if (pageId === 'products-page') {
+                loadProducts();
+                loadCategories();
+            } else if (pageId === 'locations-page') {
+                loadLocations();
+            }
+        };
+        
+        // Carica i dati della dashboard
+        function loadDashboardData() {
+            // Mostra loader
+            document.getElementById('recentOrdersLoader').style.display = 'block';
+            document.getElementById('recentOrders').innerHTML = '';
+            
+            // Carica gli ordini
+            const ordersRef = ref(database, 'orders');
+            
+            onValue(ordersRef, (snapshot) => {
+                document.getElementById('recentOrdersLoader').style.display = 'none';
+                
+                if (snapshot.exists()) {
+                    orders = [];
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const orderData = childSnapshot.val();
+                        orderData.key = childSnapshot.key;
+                        orders.push(orderData);
+                    });
+                    
+                    // Aggiorna le statistiche
+                    updateDashboardStats();
+                    
+                    // Ordina gli ordini (i più recenti prima)
+                    orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    
+                    // Mostra gli ultimi 5 ordini
+                    const recentOrders = orders.slice(0, 5);
+                    displayOrders(recentOrders, 'recentOrders');
+                } else {
+                    document.getElementById('recentOrders').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <p>Nessun ordine trovato</p>
+                        </div>
+                    `;
+                }
+            }, (error) => {
+                document.getElementById('recentOrdersLoader').style.display = 'none';
+                console.error("Error loading orders: ", error);
+                document.getElementById('recentOrders').innerHTML = `
+                    <div class="error-message">
+                        Errore nel caricamento degli ordini: ${error.message}
+                    </div>
+                `;
+            });
+                
+            // Carica i prodotti per le statistiche
+            const productsRef = ref(database, 'products');
+            
+            onValue(productsRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    products = [];
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const productData = childSnapshot.val();
+                        productData.key = childSnapshot.key;
+                        products.push(productData);
+                    });
+                    
+                    updateDashboardStats();
+                }
+            }, (error) => {
+                console.error("Error loading products: ", error);
+            });
+        }
+        
+        // Aggiorna le statistiche nella dashboard
+        function updateDashboardStats() {
+            // Calcola ordini di oggi
+            const today = new Date().toISOString().split('T')[0];
+            const ordersToday = orders.filter(order => order.date && order.date.startsWith(today)).length;
+            document.getElementById('ordersToday').textContent = ordersToday;
+            
+            // Calcola ordini in attesa
+            const pendingOrders = orders.filter(order => order.status === 'pending').length;
+            document.getElementById('pendingOrders').textContent = pendingOrders;
+            
+            // Calcola prodotti disponibili
+            const availableProducts = products.filter(product => product.quantity > 0).length;
+            document.getElementById('availableProducts').textContent = availableProducts;
+            
+            // Calcola incasso totale
+            const totalRevenue = orders
+                .filter(order => order.status === 'completed')
+                .reduce((total, order) => total + parseFloat(order.total || 0), 0);
+            document.getElementById('totalRevenue').textContent = `€${totalRevenue.toFixed(2)}`;
+        }
+        
+        // Carica gli ordini
+        function loadOrders() {
+            // Mostra loader
+            document.getElementById('ordersLoader').style.display = 'block';
+            document.getElementById('ordersList').innerHTML = '';
+            
+            // Carica gli ordini da Firebase
+            const ordersRef = ref(database, 'orders');
+            
+            onValue(ordersRef, (snapshot) => {
+                document.getElementById('ordersLoader').style.display = 'none';
+                
+                if (snapshot.exists()) {
+                    orders = [];
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const orderData = childSnapshot.val();
+                        orderData.key = childSnapshot.key;
+                        orders.push(orderData);
+                    });
+                    
+                    // Filtra gli ordini
+                    filterOrders(currentOrdersFilter);
+                } else {
+                    document.getElementById('ordersList').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <p>Nessun ordine trovato</p>
+                        </div>
+                    `;
+                }
+            }, (error) => {
+                document.getElementById('ordersLoader').style.display = 'none';
+                console.error("Error loading orders: ", error);
+                document.getElementById('ordersList').innerHTML = `
+                    <div class="error-message">
+                        Errore nel caricamento degli ordini: ${error.message}
+                    </div>
+                `;
+            });
+        }
+        
+        // Filtra gli ordini per stato
+        window.filterOrders = function(status) {
+            currentOrdersFilter = status;
+            
+            // Aggiorna i bottoni di filtro
+            document.querySelectorAll('#orders-page .filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.querySelector(`#orders-page .filter-btn[onclick="filterOrders('${status}')"]`).classList.add('active');
+            
+            // Filtra gli ordini
+            let filteredOrders = [];
+            
+            if (status === 'all') {
+                filteredOrders = [...orders];
+            } else {
+                filteredOrders = orders.filter(order => order.status === status);
+            }
+            
+            // Ordina gli ordini (i più recenti prima)
+            filteredOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Mostra gli ordini
+            displayOrders(filteredOrders, 'ordersList');
+        };
+        
+        // Mostra gli ordini nella pagina
+        function displayOrders(ordersList, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (ordersList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p>Nessun ordine trovato</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            ordersList.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                switch (order.status) {
+                    case 'pending':
+                        statusClass = 'status-pending';
+                        statusText = 'In attesa';
+                        break;
+                    case 'preparing':
+                        statusClass = 'status-preparing';
+                        statusText = 'In preparazione';
+                        break;
+                    case 'delivering':
+                        statusClass = 'status-delivering';
+                        statusText = 'In consegna';
+                        break;
+                    case 'completed':
+                        statusClass = 'status-completed';
+                        statusText = 'Completato';
+                        break;
+                    default:
+                        statusClass = 'status-pending';
+                        statusText = 'In attesa';
+                }
+                
+                // Formatta la data
+                const orderDate = order.date ? new Date(order.date) : new Date();
+                const formattedDate = orderDate.toLocaleDateString('it-IT') + ' ' + orderDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                
+                orderCard.innerHTML = `
+                    <div class="order-header">
+                        <h4>${order.id || 'ID non disponibile'}</h4>
+                        <div class="order-status ${statusClass}">${statusText}</div>
+                    </div>
+                    <p><strong>Data:</strong> ${formattedDate}</p>
+                    <p><strong>Cliente:</strong> ${order.customer ? order.customer.name : 'N/D'} ${order.customer && order.customer.phone ? `(${order.customer.phone})` : ''}</p>
+                    <p><strong>Postazione:</strong> ${order.location ? order.location.text : 'N/D'}</p>
+                    <p><strong>Totale:</strong> €${parseFloat(order.total || 0).toFixed(2)}</p>
+                    <div class="status-actions">
+                        <button class="status-btn" onclick="showOrderDetails('${order.key}')">Dettagli</button>
+                        <button class="status-btn" onclick="updateOrderStatus('${order.key}', 'preparing')">In preparazione</button>
+                        <button class="status-btn" onclick="updateOrderStatus('${order.key}', 'delivering')">In consegna</button>
+                        <button class="status-btn" onclick="updateOrderStatus('${order.key}', 'completed')">Completato</button>
+                    </div>
+                `;
+                
+                container.appendChild(orderCard);
+            });
+        }
+        
+        // Mostra i dettagli di un ordine
+        window.showOrderDetails = function(orderKey) {
+            const order = orders.find(o => o.key === orderKey);
+            
+            if (order) {
+                const orderDetails = document.getElementById('orderDetails');
+                
+                // Formatta la data
+                const orderDate = order.date ? new Date(order.date) : new Date();
+                const formattedDate = orderDate.toLocaleDateString('it-IT') + ' ' + orderDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                switch (order.status) {
+                    case 'pending':
+                        statusClass = 'status-pending';
+                        statusText = 'In attesa';
+                        break;
+                    case 'preparing':
+                        statusClass = 'status-preparing';
+                        statusText = 'In preparazione';
+                        break;
+                    case 'delivering':
+                        statusClass = 'status-delivering';
+                        statusText = 'In consegna';
+                        break;
+                    case 'completed':
+                        statusClass = 'status-completed';
+                        statusText = 'Completato';
+                        break;
+                    default:
+                        statusClass = 'status-pending';
+                        statusText = 'In attesa';
+                }
+                
+                // Prepara la lista dei prodotti
+                let productsHtml = '';
+                
+                if (order.items && order.items.length > 0) {
+                    productsHtml = '<h4>Prodotti ordinati:</h4><ul>';
+                    order.items.forEach(item => {
+                        productsHtml += `
+                            <li>
+                                ${item.name} x ${item.quantity} - €${(item.price * item.quantity).toFixed(2)}
+                            </li>
+                        `;
+                    });
+                    productsHtml += '</ul>';
+                } else {
+                    productsHtml = '<p>Nessun prodotto trovato nell\'ordine.</p>';
+                }
+                
+                orderDetails.innerHTML = `
+                    <h4>Ordine ${order.id || 'ID non disponibile'}</h4>
+                    <div class="order-status ${statusClass}" style="display: inline-block; margin-bottom: 1rem;">${statusText}</div>
+                    <p><strong>Data:</strong> ${formattedDate}</p>
+                    <p><strong>Cliente:</strong> ${order.customer ? order.customer.name : 'N/D'}</p>
+                    <p><strong>Telefono:</strong> ${order.customer && order.customer.phone ? order.customer.phone : 'N/D'}</p>
+                    <p><strong>Postazione:</strong> ${order.location ? order.location.text : 'N/D'}</p>
+                    ${productsHtml}
+                    <p><strong>Totale:</strong> €${parseFloat(order.total || 0).toFixed(2)}</p>
+                    ${order.notes ? `<p><strong>Note:</strong> ${order.notes}</p>` : ''}
+                    <div class="status-actions" style="margin-top: 1rem;">
+                        <button class="status-btn" onclick="updateOrderStatus('${order.key}', 'pending')">In attesa</button>
+                        <button class="status-btn" onclick="updateOrderStatus('${order.key}', 'preparing')">In preparazione</button>
+                        <button class="status-btn" onclick="updateOrderStatus('${order.key}', 'delivering')">In consegna</button>
+                        <button class="status-btn" onclick="updateOrderStatus('${order.key}', 'completed')">Completato</button>
+                    </div>
+                `;
+                
+                openModal('orderDetailsModal');
+            }
+        };
+        
+        // Aggiorna lo stato di un ordine
+        window.updateOrderStatus = function(orderKey, status) {
+            const orderRef = ref(database, `orders/${orderKey}`);
+            
+            update(orderRef, { status: status })
+                .then(() => {
+                    // Aggiorna localmente lo stato dell'ordine
+                    const orderIndex = orders.findIndex(o => o.key === orderKey);
+                    if (orderIndex !== -1) {
+                        orders[orderIndex].status = status;
+                    }
+                    
+                    // Aggiorna la visualizzazione
+                    if (document.getElementById('dashboard-page').classList.contains('active')) {
+                        loadDashboardData();
+                    } else if (document.getElementById('orders-page').classList.contains('active')) {
+                        filterOrders(currentOrdersFilter);
+                    }
+                    
+                    // Aggiorna i dettagli se il modal è aperto
+                    if (document.getElementById('orderDetailsModal').style.display === 'flex') {
+                        showOrderDetails(orderKey);
+                    }
+                    
+                    alert('Stato dell\'ordine aggiornato con successo!');
+                })
+                .catch((error) => {
+                    console.error("Error updating order status: ", error);
+                    alert(`Errore nell'aggiornamento dello stato: ${error.message}`);
+                });
+        };
+        
+        // Carica i prodotti
+        function loadProducts() {
+            // Mostra loader
+            document.getElementById('productsLoader').style.display = 'block';
+            document.getElementById('productsList').innerHTML = '';
+            
+            // Carica i prodotti da Firebase
+            const productsRef = ref(database, 'products');
+            
+            onValue(productsRef, (snapshot) => {
+                document.getElementById('productsLoader').style.display = 'none';
+                
+                if (snapshot.exists()) {
+                    products = [];
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const productData = childSnapshot.val();
+                        productData.key = childSnapshot.key;
+                        products.push(productData);
+                    });
+                    
+                    // Estrai le categorie uniche
+                    categories = [...new Set(products.map(product => product.category))];
+                    
+                    // Mostra i prodotti
+                    displayProducts(products);
+                } else {
+                    document.getElementById('productsList').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🍽️</div>
+                            <p>Nessun prodotto trovato</p>
+                        </div>
+                    `;
+                }
+            }, (error) => {
+                document.getElementById('productsLoader').style.display = 'none';
+                console.error("Error loading products: ", error);
+                document.getElementById('productsList').innerHTML = `
+                    <div class="error-message">
+                        Errore nel caricamento dei prodotti: ${error.message}
+                    </div>
+                `;
+            });
+        }
+        
+        // Carica le categorie dei prodotti
+        function loadCategories() {
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = '';
+            
+            // Filtro "Tutti"
+            const allFilter = document.createElement('div');
+            allFilter.className = `filter-btn ${currentProductsFilter === 'all' ? 'active' : ''}`;
+            allFilter.textContent = 'Tutti';
+            allFilter.onclick = () => filterProducts('all');
+            container.appendChild(allFilter);
+            
+            // Filtri per categoria
+            categories.forEach(category => {
+                if (category) {
+                    const categoryFilter = document.createElement('div');
+                    categoryFilter.className = `filter-btn ${currentProductsFilter === category ? 'active' : ''}`;
+                    categoryFilter.textContent = category;
+                    categoryFilter.onclick = () => filterProducts(category);
+                    container.appendChild(categoryFilter);
+                }
+            });
+        }
+        
+        // Filtra prodotti per categoria
+        window.filterProducts = function(category) {
+            currentProductsFilter = category;
+            
+            // Aggiorna i bottoni di filtro
+            document.querySelectorAll('#categoryFilters .filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                
+                if (btn.textContent === category || (btn.textContent === 'Tutti' && category === 'all')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Filtra i prodotti
+            let filteredProducts = [];
+            
+            if (category === 'all') {
+                filteredProducts = [...products];
+            } else {
+                filteredProducts = products.filter(product => product.category === category);
+            }
+            
+            // Mostra i prodotti
+            displayProducts(filteredProducts);
+        };
+        
+        // Mostra i prodotti nella pagina
+        function displayProducts(productsList) {
+            const container = document.getElementById('productsList');
+            container.innerHTML = '';
+            
+            if (productsList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🍽️</div>
+                        <p>Nessun prodotto trovato</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            productsList.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                productCard.innerHTML = `
+                    <div class="product-info">
+                        <img src="${product.image || '/api/placeholder/400/300'}" alt="${product.name}" class="product-image">
+                        <div class="product-details">
+                            <h4>${product.name || 'Senza nome'}</h4>
+                            <p><strong>Prezzo:</strong> €${parseFloat(product.price || 0).toFixed(2)}</p>
+                            <p><strong>Disponibilità:</strong> ${product.quantity || 0}</p>
+                            <p><strong>Categoria:</strong> ${product.category || 'Non specificata'}</p>
+                        </div>
+                    </div>
+                    <p>${product.description || 'Nessuna descrizione disponibile'}</p>
+                    <div class="product-actions">
+                        <button class="btn-sm" onclick="editProduct('${product.key}')">Modifica</button>
+                        <button class="btn-sm btn-danger" onclick="deleteProduct('${product.key}')">Elimina</button>
+                    </div>
+                `;
+                
+                container.appendChild(productCard);
+            });
+        }
+        
+        // Mostra il modal per aggiungere un prodotto
+        window.showAddProductModal = function() {
+            document.getElementById('productModalTitle').textContent = 'Aggiungi prodotto';
+            document.getElementById('productName').value = '';
+            document.getElementById('productDescription').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productQuantity').value = '';
+            document.getElementById('productCategory').value = 'Antipasti';
+            document.getElementById('productImage').value = '';
+            document.getElementById('productId').value = '';
+            document.getElementById('saveProductBtn').textContent = 'Salva prodotto';
+            
+            openModal('addProductModal');
+        };
+        
+        // Modifica un prodotto esistente
+        window.editProduct = function(productKey) {
+            const product = products.find(p => p.key === productKey);
+            
+            if (product) {
+                document.getElementById('productModalTitle').textContent = 'Modifica prodotto';
+                document.getElementById('productName').value = product.name || '';
+                document.getElementById('productDescription').value = product.description || '';
+                document.getElementById('productPrice').value = product.price || '';
+                document.getElementById('productQuantity').value = product.quantity || '';
+                document.getElementById('productCategory').value = product.category || 'Antipasti';
+                document.getElementById('productImage').value = product.image || '';
+                document.getElementById('productId').value = productKey;
+                document.getElementById('saveProductBtn').textContent = 'Aggiorna prodotto';
+                
+                openModal('addProductModal');
+            }
+        };
+        
+        // Salva un prodotto (nuovo o aggiornato)
+        window.saveProduct = function() {
+            const productKey = document.getElementById('productId').value;
+            const productName = document.getElementById('productName').value.trim();
+            const productDescription = document.getElementById('productDescription').value.trim();
+            const productPrice = parseFloat(document.getElementById('productPrice').value);
+            const productQuantity = parseInt(document.getElementById('productQuantity').value);
+            const productCategory = document.getElementById('productCategory').value;
+            const productImage = document.getElementById('productImage').value.trim();
+            
+            // Validazione
+            if (!productName || isNaN(productPrice) || isNaN(productQuantity)) {
+                alert('Per favore, compila tutti i campi obbligatori con valori validi.');
+                return;
+            }
+            
+            // Prepara i dati del prodotto
+            const productData = {
+                name: productName,
+                description: productDescription,
+                price: productPrice,
+                quantity: productQuantity,
+                category: productCategory,
+                image: productImage || '/api/placeholder/400/300'
+            };
+            
+            let productRef;
+            
+            if (productKey) {
+                // Aggiorna un prodotto esistente
+                productRef = ref(database, `products/${productKey}`);
+                
+                update(productRef, productData)
+                    .then(() => {
+                        closeModal('addProductModal');
+                        loadProducts();
+                        alert('Prodotto aggiornato con successo!');
+                    })
+                    .catch((error) => {
+                        console.error("Error updating product: ", error);
+                        alert(`Errore nell'aggiornamento del prodotto: ${error.message}`);
+                    });
+            } else {
+                // Aggiungi un nuovo prodotto
+                productRef = ref(database, 'products');
+                const newProductRef = push(productRef);
+                
+                set(newProductRef, productData)
+                    .then(() => {
+                        closeModal('addProductModal');
+                        loadProducts();
+                        alert('Prodotto aggiunto con successo!');
+                    })
+                    .catch((error) => {
+                        console.error("Error adding product: ", error);
+                        alert(`Errore nell'aggiunta del prodotto: ${error.message}`);
+                    });
+            }
+        };
+        
+        // Elimina un prodotto
+        window.deleteProduct = function(productKey) {
+            if (confirm('Sei sicuro di voler eliminare questo prodotto?')) {
+                const productRef = ref(database, `products/${productKey}`);
+                
+                remove(productRef)
+                    .then(() => {
+                        loadProducts();
+                        alert('Prodotto eliminato con successo!');
+                    })
+                    .catch((error) => {
+                        console.error("Error deleting product: ", error);
+                        alert(`Errore nell'eliminazione del prodotto: ${error.message}`);
+                    });
+            }
+        };
+        
+        // Carica le postazioni
+        function loadLocations() {
+            // Mostra loader
+            document.getElementById('locationsLoader').style.display = 'block';
+            document.getElementById('locationsList').innerHTML = '';
+            
+            // Carica le postazioni da Firebase
+            const locationsRef = ref(database, 'locations');
+            
+            onValue(locationsRef, (snapshot) => {
+                document.getElementById('locationsLoader').style.display = 'none';
+                
+                if (snapshot.exists()) {
+                    locations = [];
+                    const tableBody = document.getElementById('locationsList');
+                    tableBody.innerHTML = '';
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const locationData = childSnapshot.val();
+                        locationData.key = childSnapshot.key;
+                        locations.push(locationData);
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${childSnapshot.key}</td>
+                            <td>${locationData.name || 'Senza nome'}</td>
+                            <td>${locationData.description || 'Nessuna descrizione'}</td>
+                            <td>
+                                <button class="btn-sm" onclick="editLocation('${childSnapshot.key}')">Modifica</button>
+                                <button class="btn-sm btn-danger" onclick="deleteLocation('${childSnapshot.key}')">Elimina</button>
+                            </td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    document.getElementById('locationsList').innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <div class="empty-icon">📍</div>
+                                <p>Nessuna postazione trovata</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }, (error) => {
+                document.getElementById('locationsLoader').style.display = 'none';
+                console.error("Error loading locations: ", error);
+                document.getElementById('locationsList').innerHTML = `
+                    <tr>
+                        <td colspan="4" class="error-message">
+                            Errore nel caricamento delle postazioni: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
+        // Mostra il modal per aggiungere una postazione
+        window.showAddLocationModal = function() {
+            document.getElementById('locationModalTitle').textContent = 'Aggiungi postazione';
+            document.getElementById('locationName').value = '';
+            document.getElementById('locationDescription').value = '';
+            document.getElementById('locationId').value = '';
+            document.getElementById('saveLocationBtn').textContent = 'Salva postazione';
+            
+            openModal('addLocationModal');
+        };
+        
+        // Modifica una postazione esistente
+        window.editLocation = function(locationKey) {
+            const location = locations.find(l => l.key === locationKey);
+            
+            if (location) {
+                document.getElementById('locationModalTitle').textContent = 'Modifica postazione';
+                document.getElementById('locationName').value = location.name || '';
+                document.getElementById('locationDescription').value = location.description || '';
+                document.getElementById('locationId').value = locationKey;
+                document.getElementById('saveLocationBtn').textContent = 'Aggiorna postazione';
+                
+                openModal('addLocationModal');
+            }
+        };
+        
+        // Salva una postazione (nuova o aggiornata)
+        window.saveLocation = function() {
+            const locationKey = document.getElementById('locationId').value;
+            const locationName = document.getElementById('locationName').value.trim();
+            const locationDescription = document.getElementById('locationDescription').value.trim();
+            
+            // Validazione
+            if (!locationName) {
+                alert('Per favore, inserisci il nome della postazione.');
+                return;
+            }
+            
+            // Prepara i dati della postazione
+            const locationData = {
+                name: locationName,
+                description: locationDescription
+            };
+            
+            let locationRef;
+            
+            if (locationKey) {
+                // Aggiorna una postazione esistente
+                locationRef = ref(database, `locations/${locationKey}`);
+                
+                update(locationRef, locationData)
+                    .then(() => {
+                        closeModal('addLocationModal');
+                        loadLocations();
+                        alert('Postazione aggiornata con successo!');
+                    })
+                    .catch((error) => {
+                        console.error("Error updating location: ", error);
+                        alert(`Errore nell'aggiornamento della postazione: ${error.message}`);
+                    });
+            } else {
+                // Aggiungi una nuova postazione
+                locationRef = ref(database, 'locations');
+                const newLocationRef = push(locationRef);
+                
+                set(newLocationRef, locationData)
+                    .then(() => {
+                        closeModal('addLocationModal');
+                        loadLocations();
+                        alert('Postazione aggiunta con successo!');
+                    })
+                    .catch((error) => {
+                        console.error("Error adding location: ", error);
+                        alert(`Errore nell'aggiunta della postazione: ${error.message}`);
+                    });
+            }
+        };
+        
+        // Elimina una postazione
+        window.deleteLocation = function(locationKey) {
+            if (confirm('Sei sicuro di voler eliminare questa postazione?')) {
+                const locationRef = ref(database, `locations/${locationKey}`);
+                
+                remove(locationRef)
+                    .then(() => {
+                        loadLocations();
+                        alert('Postazione eliminata con successo!');
+                    })
+                    .catch((error) => {
+                        console.error("Error deleting location: ", error);
+                        alert(`Errore nell'eliminazione della postazione: ${error.message}`);
+                    });
+            }
+        };
+        
+        // Salva le impostazioni
+        window.saveSettings = function() {
+            const siteName = document.getElementById('siteName').value;
+            const siteDescription = document.getElementById('siteDescription').value;
+            const sitePhone = document.getElementById('sitePhone').value;
+            const siteEmail = document.getElementById('siteEmail').value;
+            
+            // Salva le impostazioni in Firebase
+            const settingsRef = ref(database, 'settings');
+            
+            set(settingsRef, {
+                siteName: siteName,
+                siteDescription: siteDescription,
+                sitePhone: sitePhone,
+                siteEmail: siteEmail
+            })
+                .then(() => {
+                    alert('Impostazioni salvate con successo!');
+                })
+                .catch((error) => {
+                    console.error("Error saving settings: ", error);
+                    alert(`Errore nel salvataggio delle impostazioni: ${error.message}`);
+                });
+        };
+        
+        // Cambia la password
+        window.changePassword = function() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Per favore, compila tutti i campi.');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('Le password non coincidono.');
+                return;
+            }
+            
+            if (currentPassword !== ADMIN_PASSWORD) {
+                alert('La password attuale non è corretta.');
+                return;
+            }
+            
+            // In un'app reale, qui invieresti i dati al server
+            // Per questa demo, aggiorniamo solo la variabile locale
+            window.ADMIN_PASSWORD = newPassword;
+            
+            alert('Password cambiata con successo!');
+            
+            // Resetta i campi
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        };
+        
+        // Funzione di ricerca ordini
+        window.searchOrders = function() {
+            const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
+            
+            if (!searchTerm) {
+                filterOrders(currentOrdersFilter);
+                return;
+            }
+            
+            const filteredOrders = orders.filter(order => {
+                return (
+                    (order.id && order.id.toLowerCase().includes(searchTerm)) ||
+                    (order.customer && order.customer.name && order.customer.name.toLowerCase().includes(searchTerm)) ||
+                    (order.customer && order.customer.phone && order.customer.phone.toLowerCase().includes(searchTerm)) ||
+                    (order.location && order.location.text && order.location.text.toLowerCase().includes(searchTerm))
+                );
+            });
+            
+            displayOrders(filteredOrders, 'ordersList');
+        };
+        
+        // Funzione di ricerca prodotti
+        window.searchProducts = function() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+            
+            if (!searchTerm) {
+                filterProducts(currentProductsFilter);
+                return;
+            }
+            
+            const filteredProducts = products.filter(product => {
+                return (
+                    (product.name && product.name.toLowerCase().includes(searchTerm)) ||
+                    (product.description && product.description.toLowerCase().includes(searchTerm)) ||
+                    (product.category && product.category.toLowerCase().includes(searchTerm))
+                );
+            });
+            
+            displayProducts(filteredProducts);
+        };
+        
+        // Funzioni per i modal
+        window.openModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        };
+        
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        };
+        
+        // Chiudi i modal quando si clicca fuori dal contenuto
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        };
+        
+        // Inizializza il database con dati di esempio se è vuoto
+        function initializeDatabaseIfEmpty() {
+            // Controlla se ci sono prodotti
+            get(ref(database, 'products')).then((snapshot) => {
+                if (!snapshot.exists()) {
+                    // Aggiungi prodotti di esempio
+                    const productsRef = ref(database, 'products');
+                    
+                    // Prodotti di esempio
+                    const sampleProducts = [
+                        {
+                            name: "Tagliere di formaggi",
+                            description: "Selezione di formaggi locali con miele e confetture",
+                            price: 15.00,
+                            quantity: 10,
+                            category: "Antipasti",
+                            image: "/api/placeholder/400/300"
+                        },
+                        {
+                            name: "Bruschette miste",
+                            description: "Assortimento di bruschette con prodotti dell'orto",
+                            price: 8.00,
+                            quantity: 15,
+                            category: "Antipasti",
+                            image: "/api/placeholder/400/300"
+                        },
+                        {
+                            name: "Pasta al pomodoro",
+                            description: "Pasta fresca con pomodori dell'orto e basilico",
+                            price: 10.00,
+                            quantity: 12,
+                            category: "Primi",
+                            image: "/api/placeholder/400/300"
+                        },
+                        {
+                            name: "Bottiglia d'acqua",
+                            description: "Acqua naturale 1 litro",
+                            price: 2.00,
+                            quantity: 30,
+                            category: "Bevande",
+                            image: "/api/placeholder/400/300"
+                        },
+                        {
+                            name: "Vino rosso locale",
+                            description: "Bottiglia di vino rosso della nostra cantina (750ml)",
+                            price: 18.00,
+                            quantity: 8,
+                            category: "Bevande",
+                            image: "/api/placeholder/400/300"
+                        }
+                    ];
+                    
+                    // Aggiungi ogni prodotto
+                    sampleProducts.forEach(product => {
+                        push(productsRef, product);
+                    });
+                    
+                    console.log("Database inizializzato con prodotti di esempio");
+                }
+            }).catch((error) => {
+                console.error("Error checking products: ", error);
+            });
+            
+            // Controlla se ci sono postazioni
+            get(ref(database, 'locations')).then((snapshot) => {
+                if (!snapshot.exists()) {
+                    // Aggiungi postazioni di esempio
+                    const locationsRef = ref(database, 'locations');
+                    
+                    // Postazioni di esempio
+                    const sampleLocations = [
+                        {
+                            name: "Postazione 1",
+                            description: "Sotto il grande ulivo"
+                        },
+                        {
+                            name: "Postazione 2",
+                            description: "Vicino al ruscello"
+                        },
+                        {
+                            name: "Postazione 3",
+                            description: "Vista panoramica"
+                        },
+                        {
+                            name: "Postazione 4",
+                            description: "Area ombreggiata"
+                        },
+                        {
+                            name: "Postazione 5",
+                            description: "Vicino al frutteto"
+                        }
+                    ];
+                    
+                    // Aggiungi ogni postazione
+                    sampleLocations.forEach(location => {
+                        push(locationsRef, location);
+                    });
+                    
+                    console.log("Database inizializzato con postazioni di esempio");
+                }
+            }).catch((error) => {
+                console.error("Error checking locations: ", error);
+            });
+        }
+        
+        // Inizializza il database all'avvio
+        initializeDatabaseIfEmpty();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Amministrativa - Gestione Picnic</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        header {
+            background-color: #2E7D32;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1rem;
+        }
+        
+        .sidebar {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 0.5rem;
+            color: #333;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: #e8f5e9;
+            color: #2E7D32;
+        }
+        
+        .content {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card {
+            background-color: #e8f5e9;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2E7D32;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .orders-list, .products-list {
+            margin-top: 1rem;
+        }
+        
+        .order-card, .product-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .order-header, .product-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+        
+        .order-status {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            background-color: #ffd54f;
+            color: #333;
+        }
+        
+        .status-preparing {
+            background-color: #4fc3f7;
+            color: white;
+        }
+        
+        .status-delivering {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .status-completed {
+            background-color: #66bb6a;
+            color: white;
+        }
+        
+        .status-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .status-btn {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .status-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: #2E7D32;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        button:hover {
+            background-color: #388E3C;
+        }
+        
+        .btn-secondary {
+            background-color: #757575;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #616161;
+        }
+        
+        .btn-danger {
+            background-color: #e53935;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .btn-sm {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+        }
+        
+        .search-container {
+            margin-bottom: 1rem;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .search-box input {
+            flex: 1;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .filter-btn {
+            padding: 0.3rem 0.8rem;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn.active {
+            background-color: #e8f5e9;
+            border-color: #66bb6a;
+            color: #2E7D32;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .product-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2E7D32;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #e53935;
+            padding: 1rem;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .page-btn {
+            padding: 0.3rem 0.8rem;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .page-btn.active {
+            background-color: #2E7D32;
+            color: white;
+            border-color: #2E7D32;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #757575;
+        }
+        
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-cards {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="login" class="login-container">
+        <h2>Accesso Area Amministrativa</h2>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Inserisci il tuo username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Inserisci la tua password">
+        </div>
+        <button onclick="login()">Accedi</button>
+        <div id="loginError" style="color: red; margin-top: 1rem; display: none;"></div>
+    </div>
+    
+    <div id="dashboard" style="display: none;">
+        <header>
+            <h1>Area Amministrativa - Gestione Picnic</h1>
+        </header>
+        
+        <div class="container">
+            <div class="dashboard">
+                <div class="sidebar">
+                    <h3>Menu</h3>
+                    <ul class="sidebar-menu">
+                        <li><a class="active" onclick="showPage('dashboard-page')">Dashboard</a></li>
+                        <li><a onclick="showPage('orders-page')">Ordini</a></li>
+                        <li><a onclick="showPage('products-page')">Prodotti</a></li>
+                        <li><a onclick="showPage('locations-page')">Postazioni</a></li>
+                        <li><a onclick="showPage('settings-page')">Impostazioni</a></li>
+                        <li><a onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+                
+                <div class="content">
+                    <!-- Dashboard Page -->
+                    <div id="dashboard-page" class="page active">
+                        <h2>Dashboard</h2>
+                        
+                        <div class="stat-cards">
+                            <div class="stat-card">
+                                <div class="stat-label">Ordini oggi</div>
+                                <div class="stat-number" id="ordersToday">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Ordini in attesa</div>
+                                <div class="stat-number" id="pendingOrders">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Prodotti disponibili</div>
+                                <div class="stat-number" id="availableProducts">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Incasso totale</div>
+                                <div class="stat-number" id="totalRevenue">€0</div>
+                            </div>
+                        </div>
+                        
+                        <h3>Ordini recenti</h3>
+                        <div id="recentOrdersLoader" class="loader"></div>
+                        <div id="recentOrders" class="orders-list"></div>
+                        
+                        <button onclick="showPage('orders-page')" style="margin-top: 1rem;">Vedi tutti gli ordini</button>
+                    </div>
+                    
+                    <!-- Orders Page -->
+                    <div id="orders-page" class="page">
+                        <h2>Gestione Ordini</h2>
+                        
+                        <div class="search-container">
+                            <div class="search-box">
+                                <input type="text" id="orderSearch" placeholder="Cerca ordini...">
+                                <button onclick="searchOrders()">Cerca</button>
+                            </div>
+                            <div class="filters">
+                                <div class="filter-btn active" onclick="filterOrders('all')">Tutti</div>
+                                <div class="filter-btn" onclick="filterOrders('pending')">In attesa</div>
+                                <div class="filter-btn" onclick="filterOrders('preparing')">In preparazione</div>
+                                <div class="filter-btn" onclick="filterOrders('delivering')">In consegna</div>
+                                <div class="filter-btn" onclick="filterOrders('completed')">Completati</div>
+                            </div>
+                        </div>
+                        
+                        <div id="ordersLoader" class="loader"></div>
+                        <div id="ordersList" class="orders-list"></div>
+                    </div>
+                    
+                    <!-- Products Page -->
+                    <div id="products-page" class="page">
+                        <h2>Gestione Prodotti</h2>
+                        
+                        <div class="search-container">
+                            <div class="search-box">
+                                <input type="text" id="productSearch" placeholder="Cerca prodotti...">
+                                <button onclick="searchProducts()">Cerca</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                                <div class="filters" id="categoryFilters"></div>
+                                <button onclick="showAddProductModal()">Aggiungi prodotto</button>
+                            </div>
+                        </div>
+                        
+                        <div id="productsLoader" class="loader"></div>
+                        <div id="productsList" class="products-list"></div>
+                    </div>
+                    
+                    <!-- Locations Page -->
+                    <div id="locations-page" class="page">
+                        <h2>Gestione Postazioni</h2>
+                        
+                        <button onclick="showAddLocationModal()" style="margin-bottom: 1rem;">Aggiungi postazione</button>
+                        
+                        <div id="locationsLoader" class="loader"></div>
+                        <table id="locationsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Descrizione</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody id="locationsList"></tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Settings Page -->
+                    <div id="settings-page" class="page">
+                        <h2>Impostazioni</h2>
+                        
+                        <div class="card" style="margin-bottom: 1rem;">
+                            <h3>Impostazioni generali</h3>
+                            <div class="form-group">
+                                <label for="siteName">Nome agriturismo:</label>
+                                <input type="text" id="siteName" value="Agriturismo Picnic">
+                            </div>
+                            <div class="form-group">
+                                <label for="siteDescription">Descrizione:</label>
+                                <textarea id="siteDescription" rows="3">Il miglior agriturismo della zona con servizio picnic.</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="sitePhone">Telefono:</label>
+                                <input type="text" id="sitePhone" value="+39 123 456 7890">
+                            </div>
+                            <div class="form-group">
+                                <label for="siteEmail">Email:</label>
+                                <input type="email" id="siteEmail" value="info@agriturismopicnic.it">
+                            </div>
+                            <button onclick="saveSettings()">Salva impostazioni</button>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>Cambia password</h3>
+                            <div class="form-group">
+                                <label for="currentPassword">Password attuale:</label>
+                                <input type="password" id="currentPassword">
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Nuova password:</label>
+                                <input type="password" id="newPassword">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Conferma password:</label>
+                                <input type="password" id="confirmPassword">
+                            </div>
+                            <button onclick="changePassword()">Cambia password</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="productModalTitle">Aggiungi prodotto</h3>
+                <button class="close-btn" onclick="closeModal('addProductModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="productName">Nome prodotto:</label>
+                <input type="text" id="productName" placeholder="Nome del prodotto">
+            </div>
+            <div class="form-group">
+                <label for="productDescription">Descrizione:</label>
+                <textarea id="productDescription" rows="3" placeholder="Descrizione del prodotto"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="productPrice">Prezzo (€):</label>
+                <input type="number" id="productPrice" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label for="productQuantity">Quantità disponibile:</label>
+                <input type="number" id="productQuantity" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label for="productCategory">Categoria:</label>
+                <select id="productCategory">
+                    <option value="Antipasti">Antipasti</option>
+                    <option value="Primi">Primi</option>
+                    <option value="Secondi">Secondi</option>
+                    <option value="Dolci">Dolci</option>
+                    <option value="Bevande">Bevande</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="productImage">URL Immagine:</label>
+                <input type="text" id="productImage" placeholder="https://esempio.com/immagine.jpg">
+            </div>
+            <input type="hidden" id="productId">
+            <button id="saveProductBtn" onclick="saveProduct()">Salva prodotto</button>
+        </div>
+    </div>
+    
+    <!-- Add Location Modal -->
+    <div id="addLocationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="locationModalTitle">Aggiungi postazione</h3>
+                <button class="close-btn" onclick="closeModal('addLocationModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="locationName">Nome postazione:</label>
+                <input type="text" id="locationName" placeholder="Nome della postazione">
+            </div>
+            <div class="form-group">
+                <label for="locationDescription">Descrizione:</label>
+                <textarea id="locationDescription" rows="3" placeholder="Descrizione della postazione"></textarea>
+            </div>
+            <input type="hidden" id="locationId">
+            <button id="saveLocationBtn" onclick="saveLocation()">Salva postazione</button>
+        </div>
+    </div>
+    
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Dettagli ordine</h3>
+                <button class="close-btn" onclick="closeModal('orderDetailsModal')">&times;</button>
+            </div>
+            <div id="orderDetails"></div>
+        </div>
+    </div>
+    
+    <!-- Firebase App (il core SDK JS di Firebase) -->
+    <script type="module">
+        // Importa le funzioni necessarie dai moduli SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getDatabase, 
+            ref, 
+            set, 
+            get,
+            push, 
+            remove,
+            update,
+            onValue, 
+            query,
+            orderByChild,
+            startAt,
+            endAt,
+            equalTo,
+            child 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Configurazione Firebase del tuo progetto
+        const firebaseConfig = {
+            // SOSTITUISCI con la tua configurazione Firebase
+            apiKey: "TUA_
