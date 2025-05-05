@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordini Picnic Agriturismo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        .steps-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .step-indicator {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ddd;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+        }
+        
+        .step-indicator.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .step-indicator.completed {
+            background-color: #45a049;
+            color: white;
+        }
+        
+        .prev-btn, .next-btn {
+            margin-top: 1rem;
+        }
+        
+        .prev-btn {
+            background-color: #666;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #4CAF50;
+            margin-bottom: 1rem;
+        }
+        
+        .success-text {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .order-summary {
+            text-align: left;
+            margin-top: 1rem;
+        }
+        
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            background-color: white;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-price {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .add-to-cart {
+            margin-top: 1rem;
+        }
+        
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quantity-btn {
+            background-color: #f1f1f1;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .quantity {
+            margin: 0 0.5rem;
+        }
+        
+        .cart {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .cart-icon {
+            margin-right: 0.5rem;
+        }
+        
+        .cart-count {
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .cart-content {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #f44336;
+            padding: 1rem;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ordini Picnic Agriturismo</h1>
+    </header>
+    
+    <div class="container">
+        <div class="steps-container">
+            <div class="step-indicator active" data-step="1">1</div>
+            <div class="step-indicator" data-step="2">2</div>
+            <div class="step-indicator" data-step="3">3</div>
+        </div>
+        
+        <div class="step active" id="step1">
+            <div class="card">
+                <h2>Scegli la tua postazione</h2>
+                <div class="form-group">
+                    <label for="location">Numero della postazione picnic:</label>
+                    <select id="location">
+                        <option value="">-- Seleziona --</option>
+                        <option value="1">Postazione 1 - Sotto il grande ulivo</option>
+                        <option value="2">Postazione 2 - Vicino al ruscello</option>
+                        <option value="3">Postazione 3 - Vista panoramica</option>
+                        <option value="4">Postazione 4 - Area ombreggiata</option>
+                        <option value="5">Postazione 5 - Vicino al frutteto</option>
+                    </select>
+                </div>
+                <button class="next-btn" onclick="nextStep()">Continua</button>
+            </div>
+        </div>
+        
+        <div class="step" id="step2">
+            <div class="card">
+                <h2>Scegli i prodotti</h2>
+                <div class="product-list" id="productList">
+                    <!-- Product items will be added here -->
+                </div>
+            </div>
+            
+            <div class="cart" onclick="toggleCart()">
+                <div class="cart-icon">🛒</div>
+                <div class="cart-count" id="cartCount">0</div>
+            </div>
+            
+            <div class="cart-modal" id="cartModal">
+                <div class="cart-content">
+                    <h3>Il tuo ordine</h3>
+                    <div id="cartItems">
+                        <!-- Cart items will be added here -->
+                    </div>
+                    <div id="cartTotal">Totale: €0.00</div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                        <button onclick="clearCart()" style="background-color: #f44336;">Svuota</button>
+                        <button onclick="toggleCart()">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                <button class="prev-btn" onclick="prevStep()">Indietro</button>
+                <button class="next-btn" onclick="nextStep()">Continua</button>
+            </div>
+        </div>
+        
+        <div class="step" id="step3">
+            <div class="card">
+                <h2>Completa l'ordine</h2>
+                <div class="form-group">
+                    <label for="name">Nome:</label>
+                    <input type="text" id="name" placeholder="Inserisci il tuo nome">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefono:</label>
+                    <input type="tel" id="phone" placeholder="Inserisci il tuo numero di telefono">
+                </div>
+                <div class="form-group">
+                    <label for="notes">Note speciali (opzionale):</label>
+                    <textarea id="notes" rows="3" placeholder="Eventuali richieste speciali o allergie"></textarea>
+                </div>
+                <div class="order-summary" id="orderSummary">
+                    <h3>Riepilogo dell'ordine</h3>
+                    <p><strong>Postazione:</strong> <span id="summaryLocation"></span></p>
+                    <div id="summaryItems"></div>
+                    <p><strong>Totale:</strong> <span id="summaryTotal"></span></p>
+                </div>
+                <p style="font-style: italic;">Il pagamento verrà effettuato alla consegna</p>
+                <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                    <button class="prev-btn" onclick="prevStep()">Indietro</button>
+                    <button onclick="submitOrder()">Conferma ordine</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step" id="step4">
+            <div class="card success-message">
+                <div class="success-icon">✓</div>
+                <div class="success-text">Ordine confermato!</div>
+                <p>Il tuo ordine è stato ricevuto e verrà consegnato alla tua postazione molto presto.</p>
+                <p>Numero ordine: <strong id="orderNumber"></strong></p>
+                <button onclick="startOver()">Torna alla home</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Importa le librerie Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        
+        // Configurazione Firebase
+        const firebaseConfig = {
+            databaseURL: "https://picnic-4467e-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+        
+        // Inizializza Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Dati dei prodotti (demo)
+        const products = [
+            {
+                id: 1,
+                name: "Tagliere di formaggi",
+                description: "Selezione di formaggi locali con miele",
+                price: 15.00,
+                image: "https://via.placeholder.com/300x200.png?text=Tagliere+Formaggi"
+            },
+            {
+                id: 2,
+                name: "Bruschette miste",
+                description: "Assortimento di bruschette dell'orto",
+                price: 8.00,
+                image: "https://via.placeholder.com/300x200.png?text=Bruschette"
+            },
+            {
+                id: 3,
+                name: "Insalata dell'orto",
+                description: "Insalata fresca con verdure di stagione",
+                price: 7.00,
+                image: "https://via.placeholder.com/300x200.png?text=Insalata"
+            },
+            {
+                id: 4,
+                name: "Bottiglia d'acqua",
+                description: "Acqua naturale (1L)",
+                price: 2.00,
+                image: "https://via.placeholder.com/300x200.png?text=Acqua"
+            },
+            {
+                id: 5,
+                name: "Vino rosso locale",
+                description: "Bottiglia di vino della cantina (750ml)",
+                price: 18.00,
+                image: "https://via.placeholder.com/300x200.png?text=Vino"
+            },
+            {
+                id: 6,
+                name: "Crostata di frutta",
+                description: "Crostata con frutta fresca di stagione",
+                price: 6.00,
+                image: "https://via.placeholder.com/300x200.png?text=Crostata"
+            }
+        ];
+        
+        // Variabili globali
+        let cart = [];
+        let currentStep = 1;
+        let selectedLocation = '';
+        
+        // Carica i prodotti nella pagina
+        window.onload = function() {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">€${product.price.toFixed(2)}</div>
+                    <p>${product.description}</p>
+                    <div class="add-to-cart">
+                        <div class="quantity-selector">
+                            <button class="quantity-btn" onclick="decrementQuantity(${product.id})">-</button>
+                            <span class="quantity" id="quantity-${product.id}">0</span>
+                            <button class="quantity-btn" onclick="incrementQuantity(${product.id})">+</button>
+                        </div>
+                        <button onclick="addToCart(${product.id})">Aggiungi</button>
+                    </div>
+                `;
+                productList.appendChild(productCard);
+            });
+        };
+        
+        // Funzioni per gestire la quantità
+        window.incrementQuantity = function(productId) {
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            let quantity = parseInt(quantityElement.textContent);
+            quantityElement.textContent = quantity + 1;
+        };
+        
+        window.decrementQuantity = function(productId) {
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            let quantity = parseInt(quantityElement.textContent);
+            if (quantity > 0) {
+                quantityElement.textContent = quantity - 1;
+            }
+        };
+        
+        // Funzione per aggiungere al carrello
+        window.addToCart = function(productId) {
+            const product = products.find(p => p.id === productId);
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            const quantity = parseInt(quantityElement.textContent);
+            
+            if (quantity > 0) {
+                // Verifico se il prodotto è già nel carrello
+                const existingItem = cart.find(item => item.id === productId);
+                
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    cart.push({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: quantity
+                    });
+                }
+                
+                // Reset della quantità
+                quantityElement.textContent = "0";
+                
+                // Aggiorna il conteggio del carrello
+                updateCartCount();
+                
+                // Notifica l'utente
+                alert(`${quantity} ${product.name} aggiunto al carrello!`);
+            }
+        };
+        
+        // Aggiorna il conteggio del carrello
+        function updateCartCount() {
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+        
+        // Mostra/nasconde il carrello
+        window.toggleCart = function() {
+            const cartModal = document.getElementById('cartModal');
+            const display = cartModal.style.display;
+            
+            if (display === 'flex') {
+                cartModal.style.display = 'none';
+            } else {
+                updateCartDisplay();
+                cartModal.style.display = 'flex';
+            }
+        };
+        
+        // Aggiorna il contenuto del carrello
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p>Il tuo carrello è vuoto</p>';
+                cartTotal.textContent = 'Totale: €0.00';
+                return;
+            }
+            
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div>
+                        <span>${item.name} x ${item.quantity}</span>
+                    </div>
+                    <div>€${itemTotal.toFixed(2)}</div>
+                `;
+                
+                cartItems.appendChild(cartItem);
+            });
+            
+            cartTotal.textContent = `Totale: €${total.toFixed(2)}`;
+        }
+        
+        // Svuota il carrello
+        window.clearCart = function() {
+            cart = [];
+            updateCartCount();
+            updateCartDisplay();
+        };
+        
+        // Funzioni di navigazione
+        window.nextStep = function() {
+            if (currentStep === 1) {
+                const locationSelect = document.getElementById('location');
+                if (!locationSelect.value) {
+                    alert('Per favore, seleziona una postazione!');
+                    return;
+                }
+                selectedLocation = locationSelect.value;
+            } else if (currentStep === 2) {
+                if (cart.length === 0) {
+                    alert('Il tuo carrello è vuoto! Aggiungi almeno un prodotto.');
+                    return;
+                }
+                
+                // Prepara il riepilogo dell'ordine
+                updateOrderSummary();
+            }
+            
+            // Avanza allo step successivo
+            goToStep(currentStep + 1);
+        };
+        
+        window.prevStep = function() {
+            goToStep(currentStep - 1);
+        };
+        
+        function goToStep(step) {
+            // Nascondi tutti gli step
+            document.querySelectorAll('.step').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            // Mostra lo step richiesto
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            // Aggiorna gli indicatori
+            document.querySelectorAll('.step-indicator').forEach(indicator => {
+                const indicatorStep = parseInt(indicator.dataset.step);
+                indicator.classList.remove('active', 'completed');
+                
+                if (indicatorStep === step) {
+                    indicator.classList.add('active');
+                } else if (indicatorStep < step) {
+                    indicator.classList.add('completed');
+                }
+            });
+            
+            currentStep = step;
+        }
+        
+        // Aggiorna il riepilogo dell'ordine
+        function updateOrderSummary() {
+            const locationSelect = document.getElementById('location');
+            const locationText = locationSelect.options[locationSelect.selectedIndex].text;
+            
+            document.getElementById('summaryLocation').textContent = locationText;
+            
+            const summaryItems = document.getElementById('summaryItems');
+            summaryItems.innerHTML = '';
+            
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                const itemElement = document.createElement('p');
+                itemElement.textContent = `${item.name} (x${item.quantity}) - €${itemTotal.toFixed(2)}`;
+                summaryItems.appendChild(itemElement);
+            });
+            
+            document.getElementById('summaryTotal').textContent = `€${total.toFixed(2)}`;
+        }
+        
+        // Invia l'ordine
+        window.submitOrder = function() {
+            const nameInput = document.getElementById('name');
+            const phoneInput = document.getElementById('phone');
+            const notesInput = document.getElementById('notes');
+            
+            // Validazione
+            if (!nameInput.value.trim()) {
+                alert('Per favore, inserisci il tuo nome!');
+                return;
+            }
+            
+            if (!phoneInput.value.trim()) {
+                alert('Per favore, inserisci il tuo numero di telefono!');
+                return;
+            }
+            
+            // Genera ID ordine
+            const orderId = generateOrderId();
+            
+            // Prepara i dati dell'ordine
+            const locationSelect = document.getElementById('location');
+            const locationText = locationSelect.options[locationSelect.selectedIndex].text;
+            
+            const order = {
+                id: orderId,
+                date: new Date().toISOString(),
+                customer: {
+                    name: nameInput.value.trim(),
+                    phone: phoneInput.value.trim()
+                },
+                location: {
+                    id: selectedLocation,
+                    name: locationText
+                },
+                items: cart,
+                notes: notesInput.value.trim(),
+                status: 'pending',
+                total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+            };
+            
+            // Salva l'ordine in Firebase
+            const ordersRef = ref(database, 'orders');
+            const newOrderRef = push(ordersRef);
+            
+            set(newOrderRef, order)
+                .then(() => {
+                    // Mostra il numero dell'ordine
+                    document.getElementById('orderNumber').textContent = orderId;
+                    
+                    // Passa alla pagina di successo
+                    goToStep(4);
+                    
+                    // Svuota il carrello
+                    cart = [];
+                    updateCartCount();
+                })
+                .catch((error) => {
+                    alert(`Si è verificato un errore: ${error.message}`);
+                });
+        };
+        
+        // Genera un ID ordine
+        function generateOrderId() {
+            const date = new Date();
+            const year = date.getFullYear().toString().substr(-2);
+            const month = ('0' + (date.getMonth() + 1)).slice(-2);
+            const day = ('0' + date.getDate()).slice(-2);
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            
+            return `ORD-${year}${month}${day}-${random}`;
+        }
+        
+        // Torna alla home
+        window.startOver = function() {
+            cart = [];
+            selectedLocation = '';
+            updateCartCount();
+            
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('location').value = '';
+            
+            goToStep(1);
+        };
+    </script>
+</body>
+</html>
