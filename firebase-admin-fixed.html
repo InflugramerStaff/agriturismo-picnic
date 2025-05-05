@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Amministrativa - Gestione Picnic</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        header {
+            background-color: #2E7D32;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: #2E7D32;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        button:hover {
+            background-color: #388E3C;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1rem;
+        }
+        
+        .sidebar {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 0.5rem;
+            color: #333;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: #e8f5e9;
+            color: #2E7D32;
+        }
+        
+        .content {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2E7D32;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #e53935;
+            padding: 1rem;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="login" class="login-container">
+        <h2>Accesso Area Amministrativa</h2>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Inserisci il tuo username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Inserisci la tua password">
+        </div>
+        <button onclick="login()">Accedi</button>
+        <div id="loginError" style="color: red; margin-top: 1rem; display: none;"></div>
+    </div>
+    
+    <div id="dashboard" style="display: none;">
+        <header>
+            <h1>Area Amministrativa - Gestione Picnic</h1>
+        </header>
+        
+        <div class="container">
+            <div class="dashboard">
+                <div class="sidebar">
+                    <h3>Menu</h3>
+                    <ul class="sidebar-menu">
+                        <li><a class="active" onclick="showPage('dashboard-page')">Dashboard</a></li>
+                        <li><a onclick="showPage('orders-page')">Ordini</a></li>
+                        <li><a onclick="showPage('products-page')">Prodotti</a></li>
+                        <li><a onclick="showPage('locations-page')">Postazioni</a></li>
+                        <li><a onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+                
+                <div class="content">
+                    <!-- Dashboard Page -->
+                    <div id="dashboard-page" class="page active">
+                        <h2>Dashboard</h2>
+                        <p>Benvenuto nell'area amministrativa del sistema di ordinazione picnic.</p>
+                        <p>Questo è un pannello di controllo semplificato per gestire il tuo agriturismo.</p>
+                        <p>Usa il menu a sinistra per navigare tra le varie sezioni.</p>
+                    </div>
+                    
+                    <!-- Orders Page -->
+                    <div id="orders-page" class="page">
+                        <h2>Gestione Ordini</h2>
+                        <div id="ordersList">
+                            <p>Gli ordini appariranno qui quando i clienti ne effettueranno.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Products Page -->
+                    <div id="products-page" class="page">
+                        <h2>Gestione Prodotti</h2>
+                        <p>Qui potrai gestire i prodotti disponibili per l'ordine.</p>
+                    </div>
+                    
+                    <!-- Locations Page -->
+                    <div id="locations-page" class="page">
+                        <h2>Gestione Postazioni</h2>
+                        <p>Qui potrai gestire le postazioni picnic disponibili.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Importa le librerie Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        
+        // Configurazione Firebase
+        const firebaseConfig = {
+            databaseURL: "https://picnic-4467e-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+        
+        // Inizializza Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Credenziali amministratore
+        window.ADMIN_USERNAME = "admin";
+        window.ADMIN_PASSWORD = "admin123";
+        
+        // Funzione di login
+        window.login = function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginError = document.getElementById('loginError');
+            
+            if (username === window.ADMIN_USERNAME && password === window.ADMIN_PASSWORD) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            } else {
+                loginError.textContent = 'Username o password non validi';
+                loginError.style.display = 'block';
+            }
+        };
+        
+        // Funzione di logout
+        window.logout = function() {
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        };
+        
+        // Funzione per mostrare una pagina del dashboard
+        window.showPage = function(pageId) {
+            // Nascondi tutte le pagine
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Mostra la pagina selezionata
+            document.getElementById(pageId).classList.add('active');
+            
+            // Aggiorna la classe active nel menu
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+                
+                if (link.getAttribute('onclick').includes(pageId)) {
+                    link.classList.add('active');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
