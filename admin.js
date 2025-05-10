@@ -50,7 +50,7 @@ loginButton.addEventListener('click', () => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    console.log("Tentativo di accesso con email:", email, "e password:", password);  // NUOVA RIGA
+    console.log("Tentativo di accesso con email:", email, "e password:", password); // NUOVA RIGA
 
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -204,27 +204,27 @@ function loadDashboardData() {
                 const statsHTML = `
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
                         <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3><span class="math-inline">\{pendingOrders\}</h3\>
-<p\>Ordini in attesa</p\>
-</div\>
-<div class\="card" style\="text\-align\: center; padding\: 1rem;"\>
-<h3\></span>{completedOrders}</h3>
+                            <h3>${pendingOrders}</h3>
+                            <p>Ordini in attesa</p>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 1rem;">
+                            <h3>${completedOrders}</h3>
                             <p>Ordini completati</p>
                         </div>
                         <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3><span class="math-inline">\{todayOrders\}</h3\>
-<p\>Ordini di oggi</p\>
-</div\>
-<div class\="card" style\="text\-align\: center; padding\: 1rem;"\>
-<h3\>€</span>{totalRevenue.toFixed(2)}</h3>
+                            <h3>${todayOrders}</h3>
+                            <p>Ordini di oggi</p>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 1rem;">
+                            <h3>€${totalRevenue.toFixed(2)}</h3>
                             <p>Incasso totale</p>
                         </div>
                         <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3><span class="math-inline">\{productsCount\}</h3\>
-<p\>Prodotti attivi</p\>
-</div\>
-<div class\="card" style\="text\-align\: center; padding\: 1rem;"\>
-<h3\></span>{locationsCount}</h3>
+                            <h3>${productsCount}</h3>
+                            <p>Prodotti attivi</p>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 1rem;">
+                            <h3>${locationsCount}</h3>
                             <p>Postazioni totali</p>
                         </div>
                     </div>
@@ -341,19 +341,19 @@ function displayOrders(orders) {
         ordersHTML += `
             <div class="order-card">
                 <div class="order-header">
-                    <div class="order-id"><span class="math-inline">\{order\.id\}</div\>
-<div class\="order\-date"\></span>{new Date(order.date).toLocaleString('it-IT')}</div>
-                    <div class="order-status <span class="math-inline">\{order\.status\}"\></span>{statusText}</div>
+                    <div class="order-id">${order.id}</div>
+                    <div class="order-date">${new Date(order.date).toLocaleString('it-IT')}</div>
+                    <div class="order-status ${order.status}">${statusText}</div>
                 </div>
                 <div class="order-details">
                     <div class="order-customer">
                         <strong>Cliente:</strong> ${order.customer.name} | <strong>Telefono:</strong> ${order.customer.phone}
                     </div>
                     <div class="order-location">
-                        <strong>Postazione:</strong> <span class="math-inline">\{order\.location\.name\}
-</div\>
-<div class\="order\-total"\>
-<strong\>Totale\:</strong\> €</span>{order.total.toFixed(2)}
+                        <strong>Postazione:</strong> ${order.location.name}
+                    </div>
+                    <div class="order-total">
+                        <strong>Totale:</strong> €${order.total.toFixed(2)}
                     </div>
                     ${order.notes ? `<div class="order-notes"><strong>Note:</strong> ${order.notes}</div>` : ''}
                 </div>
@@ -388,10 +388,10 @@ function viewOrderDetails(orderKey) {
         const itemTotal = item.price * item.quantity;
         itemsHTML += `
             <tr>
-                <td><span class="math-inline">\{item\.name\}</td\>
-<td\></span>{item.quantity}</td>
-                <td>€<span class="math-inline">\{item\.price\.toFixed\(2\)\}</td\>
-<td\>€</span>{itemTotal.toFixed(2)}</td>
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>€${item.price.toFixed(2)}</td>
+                <td>€${itemTotal.toFixed(2)}</td>
             </tr>
         `;
     });
@@ -400,17 +400,18 @@ function viewOrderDetails(orderKey) {
         <div style="margin-bottom: 1.5rem;">
             <p><strong>ID Ordine:</strong> ${order.id}</p>
             <p><strong>Data:</strong> ${new Date(order.date).toLocaleString('it-IT')}</p>
-            <p><strong>Stato:</strong> <span class="order-status <span class="math-inline">\{order\.status\}"\></span>{statusText}</span></p>
+            <p><strong>Stato:</strong> <span class="order-status ${order.status}">${statusText}</span></p>
         </div>
         
         <div style="margin-bottom: 1.5rem;">
             <h4>Informazioni Cliente</h4>
             <p><strong>Nome:</strong> ${order.customer.name}</p>
-            <p><strong>Telefono:</strong> <span class="math-inline">\{order\.customer\.phone\}</p\>
-</div\>
-<div style\="margin\-bottom\: 1\.5rem;"\>
-<h4\>Postazione</h4\>
-<p\></span>{order.location.name}</p>
+            <p><strong>Telefono:</strong> ${order.customer.phone}</p>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <h4>Postazione</h4>
+            <p>${order.location.name}</p>
         </div>
         
         <div style="margin-bottom: 1.5rem;">
@@ -425,12 +426,12 @@ function viewOrderDetails(orderKey) {
                     </tr>
                 </thead>
                 <tbody>
-                    <span class="math-inline">\{itemsHTML\}
-</tbody\>
-<tfoot\>
-<tr\>
-<td colspan\="3" style\="text\-align\: right;"\><strong\>Totale Ordine\:</strong\></td\>
-<td\><strong\>€</span>{order.total.toFixed(2)}</strong></td>
+                    ${itemsHTML}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right;"><strong>Totale Ordine:</strong></td>
+                        <td><strong>€${order.total.toFixed(2)}</strong></td>
                     </tr>
                 </tfoot>
             </table>
@@ -522,13 +523,13 @@ function loadProducts() {
             products.forEach(product => {
                 productsHTML += `
                     <tr>
-                        <td><span class="math-inline">\{product\.id\}</td\>
-<td\></span>{product.name}</td>
-                        <td><span class="math-inline">\{product\.description\}</td\>
-<td\>€</span>{product.price.toFixed(2)}</td>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.description}</td>
+                        <td>€${product.price.toFixed(2)}</td>
                         <td style="white-space: nowrap;">
-                            <button onclick="editProduct('<span class="math-inline">\{product\.firebaseKey\}'\)" style\="background\-color\: \#1976D2;"\>Modifica</button\>
-<button onclick\="deleteProduct\('</span>{product.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
+                            <button onclick="editProduct('${product.firebaseKey}')" style="background-color: #1976D2;">Modifica</button>
+                            <button onclick="deleteProduct('${product.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
                         </td>
                     </tr>
                 `;
@@ -717,12 +718,12 @@ function loadLocations() {
 
                 locationsHTML += `
                     <tr>
-                        <td><span class="math-inline">\{location\.number\}</td\>
-<td\></span>{location.name}</td>
-                        <td><span class="order-status <span class="math-inline">\{statusClass\}"\></span>{statusText}</span></td>
+                        <td>${location.number}</td>
+                        <td>${location.name}</td>
+                        <td><span class="order-status ${statusClass}">${statusText}</span></td>
                         <td style="white-space: nowrap;">
-                            <button onclick="editLocation('<span class="math-inline">\{location\.firebaseKey\}'\)" style\="background\-color\: \#1976D2;"\>Modifica</button\>
-<button onclick\="deleteLocation\('</span>{location.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
+                            <button onclick="editLocation('${location.firebaseKey}')" style="background-color: #1976D2;">Modifica</button>
+                            <button onclick="deleteLocation('${location.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
                         </td>
                     </tr>
                 `;
@@ -858,4 +859,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-}
