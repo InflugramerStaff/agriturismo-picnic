@@ -44,18 +44,18 @@ const loginForm = document.getElementById('login-form');
 const loginContainer = document.getElementById('login-container');
 const dashboard = document.getElementById('dashboard');
 const loginButton = document.getElementById('login-button');
-const loginError = document.getElementById('login-error');
+const loginError = document.getElementById('loginError');
 
 loginButton.addEventListener('click', () => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    console.log("Tentativo di accesso con email:", email, "e password:", password); // NUOVA RIGA
+    console.log("Tentativo di accesso con email:", email, "e password:", password);  // Aggiunto per debug
 
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Login successful (ma non sappiamo ancora se è admin)
-            console.log("Login riuscito!"); // NUOVA RIGA
+            console.log("Login riuscito!"); // Aggiunto per debug
             loginError.style.display = 'none';
         })
         .catch((error) => {
@@ -67,12 +67,12 @@ loginButton.addEventListener('click', () => {
 
 // Gestione dello stato di autenticazione (e verifica admin)
 onAuthStateChanged(auth, (user) => {
-    console.log("onAuthStateChanged attivato!", user); // NUOVA RIGA
+    console.log("onAuthStateChanged attivato!", user); // Aggiunto per debug
     if (user) {
         // Utente loggato, verifica se è admin
         checkIfAdmin(user.uid)
             .then(isAdmin => {
-                console.log("checkIfAdmin restituisce:", isAdmin); // NUOVA RIGA
+                console.log("checkIfAdmin restituisce:", isAdmin); // Aggiunto per debug
                 if (isAdmin) {
                     // È un admin, mostra il dashboard
                     loginContainer.style.display = 'none';
@@ -96,11 +96,11 @@ onAuthStateChanged(auth, (user) => {
 
 // Funzione per verificare se un utente è admin
 async function checkIfAdmin(uid) {
-    console.log("checkIfAdmin chiamato con UID:", uid); // NUOVA RIGA
+    console.log("checkIfAdmin chiamato con UID:", uid); // Aggiunto per debug
     const adminRef = ref(database, `admins/${uid}`);
     const snapshot = await get(adminRef);
     const isAdmin = snapshot.exists() && snapshot.val() === true;
-    console.log("checkIfAdmin snapshot:", snapshot.val()); // NUOVA RIGA
+    console.log("checkIfAdmin snapshot:", snapshot.val()); // Aggiunto per debug
     return isAdmin;
 }
 
@@ -335,8 +335,8 @@ function displayOrders(orders) {
     let ordersHTML = '';
 
     orders.forEach(order => {
-        const statusText = order.status === 'pending' ? 'In attesa' : 
-                          order.status === 'completed' ? 'Completato' : 'Annullato';
+        const statusText = order.status === 'pending' ? 'In attesa' :
+            order.status === 'completed' ? 'Completato' : 'Annullato';
 
         ordersHTML += `
             <div class="order-card">
@@ -654,7 +654,7 @@ function deleteProduct(productKey) {
 
 // Genera ID prodotto
 function generateProductId() {
-    const maxId = products.length > 0 
+    const maxId = products.length > 0
         ? Math.max(...products.map(p => parseInt(p.id)))
         : 0;
     return maxId + 1;
@@ -710,11 +710,11 @@ function loadLocations() {
             `;
 
             locations.forEach(location => {
-                const statusText = location.status === 'available' ? 'Disponibile' : 
-                                  location.status === 'maintenance' ? 'In Manutenzione' : 'Riservata';
+                const statusText = location.status === 'available' ? 'Disponibile' :
+                    location.status === 'maintenance' ? 'In Manutenzione' : 'Riservata';
 
-                const statusClass = location.status === 'available' ? 'completed' : 
-                                   location.status === 'maintenance' ? 'cancelled' : 'pending';
+                const statusClass = location.status === 'available' ? 'completed' :
+                    location.status === 'maintenance' ? 'cancelled' : 'pending';
 
                 locationsHTML += `
                     <tr>
