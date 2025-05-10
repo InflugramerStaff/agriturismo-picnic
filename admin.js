@@ -335,8 +335,8 @@ function displayOrders(orders) {
     let ordersHTML = '';
 
     orders.forEach(order => {
-        const statusText = order.status === 'pending' ? 'In attesa' :
-            order.status === 'completed' ? 'Completato' : 'Annullato';
+        const statusText = order.status === 'pending' ? 'In attesa' : 
+                          order.status === 'completed' ? 'Completato' : 'Annullato';
 
         ordersHTML += `
             <div class="order-card">
