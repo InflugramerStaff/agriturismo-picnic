@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picnic Agricola Guss - Ordina Online</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="client.css"> </head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-leaf"></i> Agricola Guss Picnic
+            </div>
+            <button class="cart-button" id="cartButton">
+                <i class="fas fa-shopping-basket"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="steps-container">
+            <div class="step-indicator active" id="step1-indicator">
+                1
+                <span class="step-text">Postazione</span>
+            </div>
+            <div class="step-indicator" id="step2-indicator">
+                2
+                <span class="step-text">Prodotti</span>
+            </div>
+            <div class="step-indicator" id="step3-indicator">
+                3
+                <span class="step-text">Checkout</span>
+            </div>
+            <div class="step-indicator" id="step4-indicator">
+                <i class="fas fa-check"></i>
+                <span class="step-text">Conferma</span>
+            </div>
+        </div>
+
+        <div class="step active" id="step1">
+            <div class="card">
+                <h2 class="section-title">Scegli la tua postazione</h2>
+                <p>Seleziona la postazione picnic per il tuo pranzo all'aria aperta con vista sul Lago di Como.</p>
+
+                <div class="form-group">
+                    <label for="location">Seleziona una postazione:</label>
+                    <select id="location" onchange="selectLocationFromDropdown()">
+                        <option value="">-- Seleziona --</option>
+                        </select>
+                </div>
+
+                <div id="locationsContainer">
+                    <div class="loader" id="locationsLoader" style="display: block;"></div>
+                </div>
+
+                <div class="buttons-container">
+                    <div></div>
+                    <button class="button" id="go-to-step-2">
+                        <i class="fas fa-arrow-right"></i> Continua
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step" id="step2">
+            <div class="card">
+                <h2 class="section-title">Scegli i prodotti</h2>
+                <p>Seleziona i prodotti genuini a km zero per il tuo picnic da gustare nel nostro agriturismo.</p>
+
+                <div id="productGrid" class="product-grid">
+                    <div class="loader" id="productsLoader" style="display: block;"></div>
+                </div>
+
+                <div class="buttons-container">
+                    <button class="button button-secondary" id="go-to-step-1">
+                        <i class="fas fa-arrow-left"></i> Indietro
+                    </button>
+                    <button class="button" id="go-to-step-3">
+                        <i class="fas fa-arrow-right"></i> Continua
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step" id="step3">
+            <div class="card">
+                <h2 class="section-title">Completa l'ordine</h2>
+                <p>Inserisci i tuoi dati per completare l'ordine del tuo picnic con vista lago.</p>
+
+                <div class="form-group">
+                    <label for="name">Nome e Cognome</label>
+                    <input type="text" id="name" placeholder="Inserisci il tuo nome e cognome">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Numero di Telefono</label>
+                    <input type="tel" id="phone" placeholder="Numero di telefono per contattarti">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Note speciali (opzionale)</label>
+                    <textarea id="notes" rows="3" placeholder="Eventuali richieste speciali o allergie"></textarea>
+                </div>
+
+                <div class="order-summary">
+                    <h3 class="summary-title"><i class="fas fa-clipboard-list"></i> Riepilogo dell'ordine</h3>
+
+                    <div class="summary-item">
+                        <span class="summary-item-label">Postazione:</span>
+                        <span id="summaryLocation"></span>
+                    </div>
+
+                    <div id="summaryItems">
+                        </div>
+
+                    <div class="summary-total">
+                        <span>Totale</span>
+                        <span class="summary-total-value" id="summaryTotal">€0.00</span>
+                    </div>
+                </div>
+
+                <div class="payment-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Il pagamento verrà effettuato alla consegna</span>
+                </div>
+
+                <div class="buttons-container">
+                    <button class="button button-secondary" id="go-to-step-2">
+                        <i class="fas fa-arrow-left"></i> Indietro
+                    </button>
+                    <button class="button" id="submit-order">
+                        <i class="fas fa-check"></i> Conferma Ordine
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step" id="step4">
+            <div class="card">
+                <div class="confirmation-container">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h2 class="confirmation-title">Ordine Confermato!</h2>
+                    <p class="confirmation-message">Il tuo ordine è stato ricevuto e verrà consegnato alla tua postazione
+                        molto presto. Preparati a goderti un picnic con vista mozzafiato sul Lago di Como!</p>
+
+                    <div class="order-details">
+                        <div class="order-number" id="orderNumber">Numero ordine: ORD-123456</div>
+                        <p id="orderDateTime">Data: 01/01/2023, 12:00</p>
+                    </div>
+
+                    <button class="button" id="start-over">
+                        <i class="fas fa-home"></i> Torna alla Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-container">
+            <div class="cart-header">
+                <div class="cart-title">
+                    <i class="fas fa-shopping-basket"></i> Il tuo cestino picnic
+                </div>
+                <button class="close-cart" id="close-cart">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="cart-items" id="cartItems">
+                <div class="cart-empty">
+                    <i class="fas fa-shopping-basket"></i>
+                    <p>Il tuo cestino è vuoto</p>
+                    <p>Aggiungi prodotti dal nostro menu!</p>
+                </div>
+            </div>
+
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span class="cart-total-label">Totale</span>
+                    <span class="cart-total-value" id="cartTotal">€0.00</span>
+                </div>
+
+                <div class="cart-actions">
+                    <button class="button button-danger" id="clear-cart">
+                        <i class="fas fa-trash"></i> Svuota Cestino
+                    </button>
+                    <button class="button" id="close-cart-bottom">
+                        <i class="fas fa-check"></i> Chiudi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationMessage"></span>
+    </div>
+
+    <script src="client.js" type="module"></script>
+</body>
+
+</html>

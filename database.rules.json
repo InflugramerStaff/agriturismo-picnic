@@ -1,0 +1,29 @@
+{
+    "rules": {
+      "admins": {
+        ".read": "auth != null && auth.uid == 'sKvuwDS9DnaYZYufybb9VE5cc852'",
+        ".write": "auth != null && auth.uid == 'sKvuwDS9DnaYZYufybb9VE5cc852'"
+      },
+      "locations": {
+        ".read": true,
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists() && root.child('admins').child(auth.uid).val() === true",
+        "$locationId": {
+          ".validate": "newData.hasChildren(['name', 'number', 'status']) && newData.child('name').isString() && newData.child('number').isNumber() && newData.child('status').isString()"
+        }
+      },
+      "orders": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists() && root.child('admins').child(auth.uid).val() === true",
+        ".write": true,
+        "$orderId": {
+          ".validate": "newData.hasChildren(['customer', 'date', 'items', 'location', 'notes', 'status', 'total']) && newData.child('customer').hasChildren(['name', 'phone']) && newData.child('customer').child('name').isString() && newData.child('customer').child('phone').isString() && newData.child('date').isString() && newData.child('location').hasChildren(['id', 'name']) && newData.child('location').child('id').isNumber() && newData.child('location').child('name').isString() && newData.child('status').isString() && newData.child('total').isNumber() "
+        }
+      },
+      "products": {
+        ".read": true,
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists() && root.child('admins').child(auth.uid).val() === true",
+        "$productId": {
+          ".validate": "newData.hasChildren(['name', 'description', 'price', 'image']) && newData.child('name').isString() && newData.child('description').isString() && newData.child('price').isNumber() && newData.child('image').isString()"
+        }
+      }
+    }
+  }
