@@ -34,44 +34,85 @@
         input, select, textarea { width: 100%; padding: 0.8rem 1rem; border: 1px solid #e0e0e0; border-radius: var(--radius); font-size: 1rem; background-color: var(--white); transition: var(--transition); }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--primary-light); }
         button { background-color: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: var(--radius); cursor: pointer; font-size: 1rem; font-weight: 500; transition: var(--transition); }
-        button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        button:hover:not(:disabled) { background-color: var(--primary-dark); transform: translateY(-2px); }
         .dashboard { display: grid; grid-template-columns: 250px 1fr; gap: 1rem; }
         .sidebar { background-color: var(--white); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); }
         .sidebar-menu { list-style: none; padding: 0; margin: 0; }
         .sidebar-menu li { margin-bottom: 0.5rem; }
         .sidebar-menu a { display: block; padding: 0.5rem; color: var(--text-color); text-decoration: none; border-radius: var(--radius); transition: var(--transition); cursor: pointer; }
         .sidebar-menu a:hover, .sidebar-menu a.active { background-color: var(--primary-light); color: var(--white); }
-        .content { background-color: var(--white); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+        .content { background-color: var(--white); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); min-width: 0; /* Per flex/grid item, previene overflow */}
         .page { display: none; }
         .page.active { display: block; }
         .loader { border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 2s linear infinite; margin: 2rem auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .error-message { color: #e53935; padding: 1rem; background-color: #ffebee; border-radius: var(--radius); margin: 1rem 0; text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        table, th, td { border: 1px solid #ddd; }
-        th, td { padding: 0.75rem; text-align: left; }
-        th { background-color: var(--background-light); font-weight: 600; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        tr:hover { background-color: rgba(90, 111, 65, 0.1); }
+        table th, table td { border: 1px solid #ddd; padding: 0.75rem; text-align: left; word-break: break-word; }
+        table th { background-color: var(--background-light); font-weight: 600; }
+        table tr:nth-child(even) { background-color: #f9f9f9; }
+        table tr:hover { background-color: rgba(90, 111, 65, 0.1); }
         .card { background-color: var(--background-light); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.5rem; margin-bottom: 1rem; }
-        .order-status { padding: 0.3rem 0.8rem; border-radius: var(--radius); font-size: 0.85rem; font-weight: 500; text-transform: capitalize; }
+        .card.acenter { text-align: center; }
+        .card.acenter h3, .card.acenter p { margin: 0.25rem 0; }
+        .order-status { padding: 0.3rem 0.8rem; border-radius: var(--radius); font-size: 0.85rem; font-weight: 500; text-transform: capitalize; display: inline-block; }
         .order-status.pending { background-color: #fff9c4; color: #f57f17; }
         .order-status.completed { background-color: #e8f5e9; color: #2E7D32; }
         .order-status.cancelled { background-color: #ffebee; color: #c62828; }
         .order-card { background-color: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.5rem; margin-bottom: 1.5rem; border-left: 5px solid var(--primary-color); }
-        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #eee; }
-        .order-id { font-weight: 600; font-size: 1.1rem; color: var(--primary-dark); }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+        .order-id { font-weight: 600; font-size: 1.1rem; color: var(--primary-dark); margin-right: 1rem; }
         .order-date { font-size: 0.9rem; color: var(--text-light); }
         .order-details > div { margin-bottom: 0.5rem; }
         .order-customer, .order-location, .order-total, .order-notes { font-size: 0.95rem; }
         .order-actions { margin-top: 1rem; text-align: right; }
-        .order-actions button { margin-left: 0.5rem; }
+        .order-actions button { margin-left: 0.5rem; margin-top: 0.5rem; }
         .form-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
         .form-column { flex: 1; min-width: 200px; }
         .product-form { background-color: var(--background-light); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem; box-shadow: var(--shadow); }
         #revenue-display-section { background-color: var(--background-light); padding: 1.5rem; border-radius: var(--radius); margin-top: 2rem; box-shadow: var(--shadow); }
         #revenue-display-section h3, #revenue-display-section h4 { color: var(--primary-dark); margin-bottom: 1rem; }
         #revenue-data-container table { margin-top: 0.5rem; }
+
+        .pagination-controls { margin-top: 1.5rem; text-align: center; }
+        .pagination-controls button, .pagination-controls span {
+            margin: 0 0.25rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--primary-light);
+            background-color: var(--white);
+            color: var(--primary-color);
+            cursor: pointer;
+            border-radius: var(--radius);
+            display: inline-block; /* Per gli span ellipsis */
+            vertical-align: middle;
+        }
+        .pagination-controls button:hover:not(:disabled) { background-color: var(--primary-light); color: var(--white); }
+        .pagination-controls button:disabled { background-color: var(--primary-dark); color: var(--white); cursor: default; border-color: var(--primary-dark); }
+        .pagination-controls span { border: none; background-color: transparent; cursor: default; }
+
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .sidebar { margin-bottom: 1rem; }
+            .form-row { flex-direction: column; }
+            .order-card, .product-form, #revenue-display-section, .card { padding: 1rem; }
+            h2 { font-size: 1.3rem; } 
+            h3 { font-size: 1.2rem; }
+            table, .order-details, .order-id, .order-customer, .order-location, .order-total { font-size: 0.9rem; }
+            .table-responsive-wrapper { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .table-responsive-wrapper table { min-width: 600px; /* O una larghezza minima appropriata */}
+            .order-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .order-actions button { padding: 0.6rem 1rem; font-size: 0.9rem; }
+            .login-container { margin: 50px auto; padding: 1.5rem; width: 90%; }
+            .container { padding: 0.5rem; }
+        }
+        @media (max-width: 480px) {
+            .sidebar-menu a { padding: 0.6rem; font-size: 0.9rem; }
+            button { padding: 0.7rem 1.2rem; font-size: 0.9rem; }
+            input, select, textarea { padding: 0.7rem 0.9rem; font-size: 0.9rem; }
+            h1 { font-size: 1.5rem; } h2 { font-size: 1.2rem; } h3 { font-size: 1.1rem; }
+            .card { padding: 1rem; } .card h3 { font-size: 1.5rem; } .card p { font-size: 0.85rem; }
+            .pagination-controls button, .pagination-controls span { padding: 0.4rem 0.6rem; font-size: 0.85rem; margin: 0 0.1rem; }
+        }
     </style>
 </head>
 <body>
@@ -102,7 +143,6 @@
                         <h2>Dashboard</h2>
                         <p>Benvenuto nell'area amministrativa.</p>
                         <div id="dashboard-stats"><div class="loader" id="dashboard-loader"></div></div>
-                        
                         <div id="revenue-display-section" style="margin-top: 2rem;">
                             <h3>Visualizza Fatturato per Periodo</h3>
                             <div class="form-group">
@@ -114,7 +154,7 @@
                                     <option value="annual">Annuale</option>
                                 </select>
                             </div>
-                            <div id="revenue-data-container">
+                            <div id="revenue-data-container" class="table-responsive-wrapper">
                                 <p>Seleziona un periodo per visualizzare il fatturato.</p>
                             </div>
                         </div>
@@ -122,11 +162,12 @@
                     <div id="orders-page" class="page">
                         <h2>Gestione Ordini</h2>
                         <div id="orders-filters" class="form-row" style="align-items: flex-end; margin-bottom: 1.5rem;">
-                            <div class="form-column"><label for="order-status-filter">Filtra per stato:</label><select id="order-status-filter" onchange="filterOrders()"><option value="all">Tutti</option><option value="pending">In attesa</option><option value="completed">Completati</option><option value="cancelled">Annullati</option></select></div>
-                            <div class="form-column"><label for="order-date-filter">Filtra per data:</label><input type="date" id="order-date-filter" onchange="filterOrders()"></div>
-                            <div class="form-column" style="flex: 0 0 auto;"><button onclick="clearOrderFilters()">Rimuovi Filtri</button></div>
+                            <div class="form-column"><label for="order-status-filter">Filtra per stato:</label><select id="order-status-filter" onchange="applyOrderFiltersAndPaginate()"><option value="all">Tutti</option><option value="pending">In attesa</option><option value="completed">Completati</option><option value="cancelled">Annullati</option></select></div>
+                            <div class="form-column"><label for="order-date-filter">Filtra per data:</label><input type="date" id="order-date-filter" onchange="applyOrderFiltersAndPaginate()"></div>
+                            <div class="form-column" style="flex: 0 0 auto;"><button onclick="clearOrderFiltersAndPaginate()">Rimuovi Filtri</button></div>
                         </div>
                         <div id="ordersList"><div class="loader" id="orders-loader"></div></div>
+                        <div id="orders-pagination-controls" class="pagination-controls"></div>
                     </div>
                     <div id="products-page" class="page">
                         <h2>Gestione Prodotti</h2>
@@ -138,7 +179,7 @@
                             <div class="form-row"><div class="form-column"><label for="product-price">Prezzo (€):</label><input type="number" id="product-price" step="0.01" min="0"></div><div class="form-column"><label for="product-image">URL Img:</label><input type="text" id="product-image"></div></div>
                             <div style="margin-top:1rem;"><button onclick="saveProduct()">Salva</button><button onclick="hideProductForm()" style="background-color:#757575;">Annulla</button></div>
                         </div>
-                        <div id="productsList"><div class="loader" id="products-loader"></div></div>
+                        <div id="productsList" class="table-responsive-wrapper"><div class="loader" id="products-loader"></div></div>
                     </div>
                     <div id="locations-page" class="page">
                         <h2>Gestione Postazioni</h2>
@@ -149,14 +190,14 @@
                             <div class="form-group"><label for="location-status">Stato:</label><select id="location-status"><option value="available">Disponibile</option><option value="maintenance">Manutenzione</option><option value="reserved">Riservata</option></select></div>
                             <div style="margin-top:1rem;"><button onclick="saveLocation()">Salva</button><button onclick="hideLocationForm()" style="background-color:#757575;">Annulla</button></div>
                         </div>
-                        <div id="locationsList"><div class="loader" id="locations-loader"></div></div>
+                        <div id="locationsList" class="table-responsive-wrapper"><div class="loader" id="locations-loader"></div></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div id="orderModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5);z-index:100;overflow-y:auto;">
-        <div style="background-color:white;width:80%;max-width:800px;margin:50px auto;padding:1.5rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+        <div style="background-color:white;width:90%;max-width:800px;margin:20px auto;padding:1.5rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
             <h3>Dettagli Ordine</h3><div id="orderModalContent"></div>
             <div style="text-align:right;margin-top:1rem;"><button onclick="document.getElementById('orderModal').style.display = 'none';">Chiudi</button></div>
         </div>
@@ -172,9 +213,17 @@
 
     window.ADMIN_USERNAME = "admin";
     window.ADMIN_PASSWORD = "admin123";
-    window.ordersData = { all: [], weeklyRevenue: {}, monthlyRevenue: {}, annualRevenue: {} }; // Unico oggetto per i dati degli ordini e fatturato aggregato
-    window.products = [];
-    window.locations = [];
+    window.appData = { 
+        allOrders: [], // Tutti gli ordini caricati da Firebase
+        filteredAndSortedOrders: [], // Ordini dopo filtri e ordinamento, base per paginazione
+        weeklyRevenue: {}, 
+        monthlyRevenue: {}, 
+        annualRevenue: {},
+        products: [],
+        locations: [],
+        currentOrdersPage: 1,
+        ORDERS_PER_PAGE: 15
+    };
 
     let unsubscribeDashboardOrders = null;
     let unsubscribeOrdersPage = null;
@@ -213,7 +262,7 @@
         if (pageId !== 'locations-page' && unsubscribeLocationsPage) { unsubscribeLocationsPage(); unsubscribeLocationsPage = null; }
 
         if (pageId === 'dashboard-page') loadDashboardData();
-        else if (pageId === 'orders-page') loadOrders();
+        else if (pageId === 'orders-page') loadOrdersPageData(); // Rinominata per chiarezza
         else if (pageId === 'products-page') loadProducts();
         else if (pageId === 'locations-page') loadLocations();
     };
@@ -231,9 +280,8 @@
 
         if (loader) loader.style.display = 'block';
         if (statsContainer) statsContainer.innerHTML = '';
-        if (revenueSelector) revenueSelector.value = 'none'; // Reset selector
+        if (revenueSelector) revenueSelector.value = 'none'; 
         if (revenueContainer) revenueContainer.innerHTML = '<p>Seleziona un periodo per visualizzare il fatturato.</p>';
-
 
         if (unsubscribeDashboardOrders) { unsubscribeDashboardOrders(); unsubscribeDashboardOrders = null; }
 
@@ -241,7 +289,8 @@
         unsubscribeDashboardOrders = onValue(ordersRef, (snapshot) => {
             const raw = snapshot.val();
             const allOrders = raw ? Object.values(raw).map(o => ({...o, date: new Date(o.date)})) : [];
-            window.ordersData.all = allOrders; // Salva tutti gli ordini per statistiche e dettagli
+            // Salva in appData per coerenza, anche se Dashboard usa direttamente allOrders qui
+            window.appData.allOrders = allOrders; 
             
             const pending = allOrders.filter(o => o.status === 'pending').length;
             const completed = allOrders.filter(o => o.status === 'completed').length;
@@ -263,13 +312,14 @@
                             <div class="card acenter"><h3 class="m0">${pCount}</h3><p class="m0">Prodotti</p></div>
                             <div class="card acenter"><h3 class="m0">${lCount}</h3><p class="m0">Postazioni</p></div>
                         </div>
-                        <h3 style="margin-top:2rem;">Ultimi Ordini (max 5)</h3>
-                        <table><thead><tr><th>ID</th><th>Cliente</th><th>Totale</th><th>Stato</th><th>Data</th></tr></thead><tbody>
-                        ${allOrders.sort((a,b)=>b.date-a.date).slice(0,5).map(o=>`<tr><td>${o.id}</td><td>${o.customer.name}</td><td>€${(o.total||0).toFixed(2)}</td><td><span class="order-status ${o.status}">${o.status}</span></td><td>${o.date.toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</td></tr>`).join('')}
-                        </tbody></table>`;
+                        <div class="table-responsive-wrapper">
+                            <h3 style="margin-top:2rem;">Ultimi Ordini (max 5)</h3>
+                            <table><thead><tr><th>ID</th><th>Cliente</th><th>Totale</th><th>Stato</th><th>Data</th></tr></thead><tbody>
+                            ${allOrders.sort((a,b)=>b.date-a.date).slice(0,5).map(o=>`<tr><td>${o.id}</td><td>${o.customer.name}</td><td>€${(o.total||0).toFixed(2)}</td><td><span class="order-status ${o.status}">${o.status}</span></td><td>${o.date.toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</td></tr>`).join('')}
+                            </tbody></table>
+                        </div>`;
                 }
 
-                // Aggregazione Fatturato
                 const weeklyRev = {}, monthlyRev = {}, annualRev = {};
                 const validForRev = allOrders.filter(o => o.status !== 'cancelled' && o.date);
                 validForRev.forEach(o => {
@@ -281,15 +331,11 @@
                     monthlyRev[mKey] = (monthlyRev[mKey]||0) + rev;
                     annualRev[`${y}`] = (annualRev[`${y}`]||0) + rev;
                 });
-                window.ordersData.weeklyRevenue = weeklyRev;
-                window.ordersData.monthlyRevenue = monthlyRev;
-                window.ordersData.annualRevenue = annualRev;
+                window.appData.weeklyRevenue = weeklyRev;
+                window.appData.monthlyRevenue = monthlyRev;
+                window.appData.annualRevenue = annualRev;
                 
-                // Se un periodo era già selezionato, aggiorna la visualizzazione
-                if (revenueSelector && revenueSelector.value !== 'none') {
-                    displayRevenueData();
-                }
-
+                if (revenueSelector && revenueSelector.value !== 'none') displayRevenueData();
                 if (loader) loader.style.display = 'none';
             }).catch(err => { console.error("Errore fetch P/L:", err); if(loader)loader.style.display='none';});
         }, (err) => { console.error("Dashboard: Errore onValue:", err); if(loader)loader.style.display='none'; if(statsContainer)statsContainer.innerHTML="<p class='error-message'>Errore dati.</p>"; if(unsubscribeDashboardOrders){unsubscribeDashboardOrders();unsubscribeDashboardOrders=null;}});
@@ -298,51 +344,185 @@
     window.displayRevenueData = function() {
         const period = document.getElementById('revenue-period-selector')?.value;
         const container = document.getElementById('revenue-data-container');
-        if (!container) return;
-        container.innerHTML = '';
+        if (!container) return; container.innerHTML = '';
 
-        if (!period || period === 'none') {
-            container.innerHTML = "<p>Seleziona un periodo per visualizzare il fatturato.</p>";
-            return;
-        }
+        if (!period || period === 'none') { container.innerHTML = "<p>Seleziona un periodo.</p>"; return; }
 
-        let data, caption, periodKeyFormat;
-        switch (period) {
-            case 'weekly': data = window.ordersData.weeklyRevenue; caption = 'Fatturato Settimanale'; periodKeyFormat = (key) => { const [y,m,d] = key.split('-'); return `Settimana del ${d}/${m}/${y}`; }; break;
-            case 'monthly': data = window.ordersData.monthlyRevenue; caption = 'Fatturato Mensile'; periodKeyFormat = (key) => { const [y,m] = key.split('-'); return `${m}/${y}`; }; break;
-            case 'annual': data = window.ordersData.annualRevenue; caption = 'Fatturato Annuale'; periodKeyFormat = (key) => key; break;
-            default: container.innerHTML = "<p>Periodo non valido.</p>"; return;
+        let data, caption, formatKey;
+        switch(period){
+            case 'weekly': data=window.appData.weeklyRevenue; caption='Fatturato Settimanale'; formatKey=k=>{const [y,m,d]=k.split('-');return `Sett. del ${d}/${m}/${y}`;}; break;
+            case 'monthly': data=window.appData.monthlyRevenue; caption='Fatturato Mensile'; formatKey=k=>{const [y,m]=k.split('-');return `${m}/${y}`;}; break;
+            case 'annual': data=window.appData.annualRevenue; caption='Fatturato Annuale'; formatKey=k=>k; break;
+            default: container.innerHTML="<p>Periodo non valido.</p>"; return;
         }
-
-        if (!data || Object.keys(data).length === 0) {
-            container.innerHTML = `<p>Nessun dato di fatturato per il periodo ${period}.</p>`;
-            return;
-        }
-        
+        if(!data || Object.keys(data).length===0){container.innerHTML=`<p>Nessun dato per ${period}.</p>`; return;}
         let table = `<h4>${caption}</h4><table><thead><tr><th>Periodo</th><th>Fatturato (€)</th></tr></thead><tbody>`;
-        Object.keys(data).sort().forEach(key => { // Ordina i periodi
-            table += `<tr><td>${periodKeyFormat(key)}</td><td>${data[key].toFixed(2)}</td></tr>`;
+        Object.keys(data).sort((a,b) => new Date(a.split('-').join(',')) - new Date(b.split('-').join(',')) ).forEach(key => { // Ordina per data
+            table += `<tr><td>${formatKey(key)}</td><td>${data[key].toFixed(2)}</td></tr>`;
         });
-        table += `</tbody></table>`;
-        container.innerHTML = table;
+        table += `</tbody></table>`; container.innerHTML = table;
     };
     
-    // --- Funzioni Ordini, Prodotti, Postazioni (con gestione listener come da ultimo esempio) ---
-    window.loadOrders=function(){const l=document.getElementById('orders-loader'),c=document.getElementById('ordersList');if(l)l.style.display='block';if(c)c.innerHTML='';if(unsubscribeOrdersPage){unsubscribeOrdersPage();unsubscribeOrdersPage=null;} unsubscribeOrdersPage=onValue(ref(database,'orders'),s=>{const d=s.val();window.ordersData.all=d?Object.entries(d).map(([k,v])=>({...v,firebaseKey:k,date:new Date(v.date)})):[];window.ordersData.all.sort((a,b)=>b.date-a.date);filterOrders();if(l)l.style.display='none';},e=>{console.error(e);if(c)c.innerHTML="<p class='error-message'>Errore ordini</p>";if(l)l.style.display='none';if(unsubscribeOrdersPage){unsubscribeOrdersPage();unsubscribeOrdersPage=null;}});};
-    window.clearOrderFilters=()=>{const sf=document.getElementById('order-status-filter'),df=document.getElementById('order-date-filter');if(sf)sf.value='all';if(df)df.value='';filterOrders();};
-    window.filterOrders=()=>{const s=document.getElementById('order-status-filter')?.value,dVal=document.getElementById('order-date-filter')?.value;let f=[...window.ordersData.all];if(s&&s!=='all')f=f.filter(o=>o.status===s);if(dVal){const fD=new Date(dVal);fD.setHours(0,0,0,0);f=f.filter(o=>{const oD=new Date(o.date);oD.setHours(0,0,0,0);return oD.getTime()===fD.getTime();});} displayOrders(f);};
-    window.displayOrders=o=>{const el=document.getElementById('ordersList');if(!el)return;if(o.length===0){el.innerHTML='<p>Nessun ordine.</p>';return;}el.innerHTML=o.map(ord=>{const st=ord.status==='pending'?'In attesa':ord.status==='completed'?'Completato':ord.status==='cancelled'?'Annullato':ord.status;return `<div class="order-card"><div class="order-header"><div class="order-id">#${ord.id}</div><div class="order-date">${ord.date.toLocaleString('it-IT',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div><span class="order-status ${ord.status}">${st}</span></div><div class="order-details"><div><strong>Cliente:</strong> ${ord.customer.name} | ${ord.customer.phone}</div><div><strong>Postaz.:</strong> ${ord.location.name} (#${ord.location.number})</div><div><strong>Totale:</strong> €${(ord.total||0).toFixed(2)}</div>${ord.notes?`<div><strong>Note:</strong> ${ord.notes}</div>`:''}</div><div class="order-actions"><button onclick="viewOrderDetails('${ord.firebaseKey}')">Dettagli</button>${ord.status==='pending'?`<button onclick="updateOrderStatus('${ord.firebaseKey}','completed')" style="background-color:var(--primary-dark);">Completa</button><button onclick="updateOrderStatus('${ord.firebaseKey}','cancelled')" style="background-color:#c62828;">Annulla</button>`:''}</div></div>`;}).join('');};
-    window.viewOrderDetails=k=>{const o=window.ordersData.all.find(ord=>ord.firebaseKey===k);if(!o)return;const m=document.getElementById('orderModal'),c=document.getElementById('orderModalContent');if(!m||!c)return;const it=(o.items&&Array.isArray(o.items))?o.items.map(i=>`<tr><td>${i.name||'N/D'}</td><td>${i.quantity||0}</td><td>€${(i.price||0).toFixed(2)}</td><td>€${((i.price||0)*(i.quantity||0)).toFixed(2)}</td></tr>`).join(''):'';c.innerHTML=`<p><strong>ID:</strong> ${o.id}</p><p><strong>Data:</strong> ${o.date.toLocaleString('it-IT')}</p><p><strong>Stato:</strong> <span class="order-status ${o.status}">${o.status}</span></p><h4>Cliente</h4><p>${o.customer.name}, ${o.customer.phone}</p><h4>Postazione</h4><p>${o.location.name} (#${o.location.number})</p><h4>Prodotti</h4><table><thead><tr><th>Prodotto</th><th>Q.tà</th><th>Prezzo U.</th><th>Totale</th></tr></thead><tbody>${it}</tbody><tfoot><tr><td colspan="3" style="text-align:right;"><strong>Totale Ordine:</strong></td><td><strong>€${(o.total||0).toFixed(2)}</strong></td></tr></tfoot></table>${o.notes?`<h4>Note</h4><p>${o.notes}</p>`:''}${o.status==='pending'?`<div style="text-align:right;margin-top:1rem;"><button onclick="updateOrderStatus('${o.firebaseKey}','completed')" style="background-color:var(--primary-dark);">Completa</button><button onclick="updateOrderStatus('${o.firebaseKey}','cancelled')" style="background-color:#c62828;">Annulla</button></div>`:''}`;m.style.display='block';};
+    // --- PAGINA ORDINI CON PAGINAZIONE ---
+    window.loadOrdersPageData = function() {
+        const loader = document.getElementById('orders-loader');
+        const listEl = document.getElementById('ordersList');
+        if (loader) loader.style.display = 'block';
+        if (listEl) listEl.innerHTML = ''; // Pulisci prima di caricare
+
+        if (unsubscribeOrdersPage) { unsubscribeOrdersPage(); unsubscribeOrdersPage = null; }
+        
+        const ordersRef = ref(database, 'orders');
+        unsubscribeOrdersPage = onValue(ordersRef, (snapshot) => {
+            const data = snapshot.val();
+            window.appData.allOrders = data ? Object.entries(data).map(([k, v]) => ({ ...v, firebaseKey: k, date: new Date(v.date) })) : [];
+            applyOrderFiltersAndPaginate(); // Applica filtri (se ci sono) e visualizza la prima pagina
+            if (loader) loader.style.display = 'none';
+        }, (error) => {
+            console.error("Errore caricamento ordini per pagina ordini:", error);
+            if (listEl) listEl.innerHTML = "<p class='error-message'>Errore nel caricamento degli ordini.</p>";
+            if (loader) loader.style.display = 'none';
+            if (unsubscribeOrdersPage) { unsubscribeOrdersPage(); unsubscribeOrdersPage = null; }
+        });
+    };
+
+    window.applyOrderFiltersAndPaginate = function() {
+        const statusFilter = document.getElementById('order-status-filter')?.value;
+        const dateFilterValue = document.getElementById('order-date-filter')?.value;
+        
+        let filtered = [...window.appData.allOrders];
+
+        if (statusFilter && statusFilter !== 'all') {
+            filtered = filtered.filter(order => order.status === statusFilter);
+        }
+        if (dateFilterValue) {
+            const filterDate = new Date(dateFilterValue); filterDate.setHours(0, 0, 0, 0);
+            filtered = filtered.filter(order => {
+                const orderDate = new Date(order.date); orderDate.setHours(0, 0, 0, 0);
+                return orderDate.getTime() === filterDate.getTime();
+            });
+        }
+        
+        window.appData.filteredAndSortedOrders = filtered.sort((a, b) => b.date - a.date); // Ordina sempre per data più recente
+        window.appData.currentOrdersPage = 1; // Resetta alla prima pagina dopo un nuovo filtro/ordinamento
+        renderCurrentPageOrders();
+    };
+
+    window.clearOrderFiltersAndPaginate = function() {
+        const statusFilterEl = document.getElementById('order-status-filter');
+        const dateFilterEl = document.getElementById('order-date-filter');
+        if (statusFilterEl) statusFilterEl.value = 'all';
+        if (dateFilterEl) dateFilterEl.value = '';
+        applyOrderFiltersAndPaginate();
+    };
+
+    function renderCurrentPageOrders() {
+        const listEl = document.getElementById('ordersList');
+        if (!listEl) return;
+
+        const { filteredAndSortedOrders, currentOrdersPage, ORDERS_PER_PAGE } = window.appData;
+        
+        const startIndex = (currentOrdersPage - 1) * ORDERS_PER_PAGE;
+        const endIndex = startIndex + ORDERS_PER_PAGE;
+        const ordersToDisplay = filteredAndSortedOrders.slice(startIndex, endIndex);
+
+        if (ordersToDisplay.length === 0 && filteredAndSortedOrders.length > 0) {
+             listEl.innerHTML = '<p>Nessun ordine in questa pagina, prova a cambiare pagina o filtri.</p>';
+        } else if (filteredAndSortedOrders.length === 0) {
+            listEl.innerHTML = '<p>Nessun ordine trovato con i filtri selezionati.</p>';
+        } else {
+            listEl.innerHTML = ordersToDisplay.map(ord => {
+                const st = ord.status === 'pending' ? 'In attesa' : ord.status === 'completed' ? 'Completato' : ord.status === 'cancelled' ? 'Annullato' : ord.status;
+                return `<div class="order-card">
+                    <div class="order-header">
+                        <div class="order-id">Ordine #${ord.id || 'N/D'}</div>
+                        <div class="order-date">${ord.date.toLocaleString('it-IT',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+                        <span class="order-status ${ord.status}">${st}</span>
+                    </div>
+                    <div class="order-details">
+                        <div><strong>Cliente:</strong> ${ord.customer.name} | ${ord.customer.phone}</div>
+                        <div><strong>Postazione:</strong> ${ord.location.name} (#${ord.location.number})</div>
+                        <div><strong>Totale:</strong> €${(ord.total||0).toFixed(2)}</div>
+                        ${ord.notes?`<div><strong>Note:</strong> ${ord.notes}</div>`:''}
+                    </div>
+                    <div class="order-actions">
+                        <button onclick="viewOrderDetails('${ord.firebaseKey}')">Dettagli</button>
+                        ${ord.status==='pending'?`<button onclick="updateOrderStatus('${ord.firebaseKey}','completed')" style="background-color:var(--primary-dark);">Completa</button><button onclick="updateOrderStatus('${ord.firebaseKey}','cancelled')" style="background-color:#c62828;">Annulla</button>`:''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        renderOrdersPaginationControls();
+    }
+
+    function renderOrdersPaginationControls() {
+        const paginationContainer = document.getElementById('orders-pagination-controls');
+        if (!paginationContainer) return;
+        paginationContainer.innerHTML = '';
+
+        const totalPages = Math.ceil(window.appData.filteredAndSortedOrders.length / window.appData.ORDERS_PER_PAGE);
+        const currentPage = window.appData.currentOrdersPage;
+
+        if (totalPages <= 1) return;
+
+        const createButton = (text, page, isDisabled = false, isCurrent = false) => {
+            const btn = document.createElement('button');
+            btn.textContent = text;
+            btn.onclick = () => changeOrdersPage(page);
+            btn.disabled = isDisabled || isCurrent;
+            if (isCurrent) { btn.style.fontWeight = 'bold'; btn.style.backgroundColor = 'var(--primary-dark)';}
+            return btn;
+        };
+        const createSpan = (text) => { const span = document.createElement('span'); span.textContent = text; return span; };
+        
+        if (currentPage > 1) paginationContainer.appendChild(createButton('Precedente', currentPage - 1));
+
+        const maxPagesToShow = 5; // Numero di bottoni pagina da mostrare
+        let startPage, endPage;
+        if (totalPages <= maxPagesToShow) {
+            startPage = 1; endPage = totalPages;
+        } else {
+            if (currentPage <= Math.ceil(maxPagesToShow / 2)) {
+                startPage = 1; endPage = maxPagesToShow;
+            } else if (currentPage + Math.floor(maxPagesToShow / 2) >= totalPages) {
+                startPage = totalPages - maxPagesToShow + 1; endPage = totalPages;
+            } else {
+                startPage = currentPage - Math.floor(maxPagesToShow / 2); endPage = currentPage + Math.floor(maxPagesToShow / 2);
+            }
+        }
+
+        if (startPage > 1) {
+            paginationContainer.appendChild(createButton('1', 1));
+            if (startPage > 2) paginationContainer.appendChild(createSpan('...'));
+        }
+        for (let i = startPage; i <= endPage; i++) {
+            paginationContainer.appendChild(createButton(i, i, false, i === currentPage));
+        }
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) paginationContainer.appendChild(createSpan('...'));
+            paginationContainer.appendChild(createButton(totalPages, totalPages));
+        }
+        if (currentPage < totalPages) paginationContainer.appendChild(createButton('Successivo', currentPage + 1));
+    }
+
+    window.changeOrdersPage = function(pageNumber) {
+        window.appData.currentOrdersPage = pageNumber;
+        renderCurrentPageOrders();
+    };
+
+    window.viewOrderDetails=k=>{const o=window.appData.allOrders.find(ord=>ord.firebaseKey===k);if(!o)return;const m=document.getElementById('orderModal'),c=document.getElementById('orderModalContent');if(!m||!c)return;const it=(o.items&&Array.isArray(o.items))?o.items.map(i=>`<tr><td>${i.name||'N/D'}</td><td>${i.quantity||0}</td><td>€${(i.price||0).toFixed(2)}</td><td>€${((i.price||0)*(i.quantity||0)).toFixed(2)}</td></tr>`).join(''):'';c.innerHTML=`<p><strong>ID:</strong> ${o.id}</p><p><strong>Data:</strong> ${new Date(o.date).toLocaleString('it-IT')}</p><p><strong>Stato:</strong> <span class="order-status ${o.status}">${o.status}</span></p><h4>Cliente</h4><p>${o.customer.name}, ${o.customer.phone}</p><h4>Postazione</h4><p>${o.location.name} (#${o.location.number})</p><h4>Prodotti</h4><div class="table-responsive-wrapper"><table><thead><tr><th>Prodotto</th><th>Q.tà</th><th>Prezzo U.</th><th>Totale</th></tr></thead><tbody>${it}</tbody><tfoot><tr><td colspan="3" style="text-align:right;"><strong>Totale Ordine:</strong></td><td><strong>€${(o.total||0).toFixed(2)}</strong></td></tr></tfoot></table></div>${o.notes?`<h4>Note</h4><p>${o.notes}</p>`:''}${o.status==='pending'?`<div style="text-align:right;margin-top:1rem;"><button onclick="updateOrderStatus('${o.firebaseKey}','completed')" style="background-color:var(--primary-dark);">Completa</button><button onclick="updateOrderStatus('${o.firebaseKey}','cancelled')" style="background-color:#c62828;">Annulla</button></div>`:''}`;m.style.display='block';};
     window.updateOrderStatus=(k,ns)=>{update(ref(database,`orders/${k}`),{status:ns}).then(()=>{if(document.getElementById('orderModal'))document.getElementById('orderModal').style.display='none';alert(`Ordine ${ns}!`)}).catch(e=>{console.error(e);alert("Errore.")})};
-    window.loadProducts=()=>{const l=document.getElementById('products-loader'),c=document.getElementById('productsList');if(l)l.style.display='block';if(c)c.innerHTML='';if(unsubscribeProductsPage){unsubscribeProductsPage();unsubscribeProductsPage=null;} unsubscribeProductsPage=onValue(ref(database,'products'),s=>{const d=s.val();window.products=d?Object.entries(d).map(([k,v])=>({...v,firebaseKey:k})):[];if(c){if(window.products.length===0)c.innerHTML="<p>Nessun prodotto.</p>";else c.innerHTML=`<table><thead><tr><th>ID</th><th>Nome</th><th>Desc.</th><th>Prezzo</th><th>Azioni</th></tr></thead><tbody>${window.products.map(p=>`<tr><td>${p.id}</td><td>${p.name}</td><td>${(p.description||'').substring(0,30)}...</td><td>€${(p.price||0).toFixed(2)}</td><td style="white-space:nowrap;"><button onclick="editProduct('${p.firebaseKey}')" style="background-color:#1976D2;margin-right:5px;">Mod.</button><button onclick="deleteProduct('${p.firebaseKey}')" style="background-color:#c62828;">Elim.</button></td></tr>`).join('')}</tbody></table>`;} if(l)l.style.display='none';},e=>{console.error(e);if(c)c.innerHTML="<p class='error-message'>Errore prodotti</p>";if(l)l.style.display='none';if(unsubscribeProductsPage){unsubscribeProductsPage();unsubscribeProductsPage=null;}});};
-    window.showProductForm=(e=false,k=null)=>{const f=document.getElementById('product-form'),t=document.getElementById('product-form-title'),i=document.getElementById('product-id'),n=document.getElementById('product-name'),d=document.getElementById('product-description'),p=document.getElementById('product-price'),m=document.getElementById('product-image');if(!f||!t||!i||!n||!d||!p||!m)return;f.style.display='block';t.textContent=e?'Modifica Prodotto':'Aggiungi Prodotto';i.value=k||'';if(e&&k){const o=window.products.find(x=>x.firebaseKey===k);if(o){n.value=o.name;d.value=o.description;p.value=o.price;m.value=o.image;}}else{n.value='';d.value='';p.value='';m.value='';}};
+    
+    // --- Funzioni Prodotti e Postazioni (con gestione listener e table-responsive-wrapper) ---
+    window.loadProducts=()=>{const l=document.getElementById('products-loader'),c=document.getElementById('productsList');if(l)l.style.display='block';if(c)c.innerHTML='';if(unsubscribeProductsPage){unsubscribeProductsPage();unsubscribeProductsPage=null;} unsubscribeProductsPage=onValue(ref(database,'products'),s=>{const d=s.val();window.appData.products=d?Object.entries(d).map(([k,v])=>({...v,firebaseKey:k})):[];if(c){if(window.appData.products.length===0)c.innerHTML="<p>Nessun prodotto.</p>";else c.innerHTML=`<table><thead><tr><th>ID</th><th>Nome</th><th>Desc.</th><th>Prezzo</th><th>Azioni</th></tr></thead><tbody>${window.appData.products.map(p=>`<tr><td>${p.id}</td><td>${p.name}</td><td>${(p.description||'').substring(0,30)}...</td><td>€${(p.price||0).toFixed(2)}</td><td style="white-space:nowrap;"><button onclick="editProduct('${p.firebaseKey}')" style="background-color:#1976D2;margin-right:5px;">Mod.</button><button onclick="deleteProduct('${p.firebaseKey}')" style="background-color:#c62828;">Elim.</button></td></tr>`).join('')}</tbody></table>`;} if(l)l.style.display='none';},e=>{console.error(e);if(c)c.innerHTML="<p class='error-message'>Errore prodotti</p>";if(l)l.style.display='none';if(unsubscribeProductsPage){unsubscribeProductsPage();unsubscribeProductsPage=null;}});};
+    window.showProductForm=(e=false,k=null)=>{const f=document.getElementById('product-form'),t=document.getElementById('product-form-title'),i=document.getElementById('product-id'),n=document.getElementById('product-name'),d=document.getElementById('product-description'),p=document.getElementById('product-price'),m=document.getElementById('product-image');if(!f||!t||!i||!n||!d||!p||!m)return;f.style.display='block';t.textContent=e?'Modifica Prodotto':'Aggiungi Prodotto';i.value=k||'';if(e&&k){const o=window.appData.products.find(x=>x.firebaseKey===k);if(o){n.value=o.name;d.value=o.description;p.value=o.price;m.value=o.image;}}else{n.value='';d.value='';p.value='';m.value='';}};
     window.editProduct=k=>showProductForm(true,k);window.hideProductForm=()=>{if(document.getElementById('product-form'))document.getElementById('product-form').style.display='none';};
-    window.saveProduct=()=>{const k=document.getElementById('product-id').value,n=document.getElementById('product-name').value.trim(),d=document.getElementById('product-description').value.trim(),p=parseFloat(document.getElementById('product-price').value),i=document.getElementById('product-image').value.trim();if(!n){alert('Nome!');return;}if(isNaN(p)||p<=0){alert('Prezzo!');return;}const o={name:n,description:d,price:p,image:i||`https://via.placeholder.com/300x200.png?text=${n.replace(/ /g,'+')}`};if(k){o.id=window.products.find(x=>x.firebaseKey===k).id;update(ref(database,`products/${k}`),o).then(()=>alert('Aggiornato!')).catch(console.error);}else{o.id=window.products.length>0?Math.max(0,...window.products.map(x=>parseInt(x.id)||0))+1:1;push(ref(database,'products'),o).then(()=>alert('Aggiunto!')).catch(console.error);} hideProductForm();};
+    window.saveProduct=()=>{const k=document.getElementById('product-id').value,n=document.getElementById('product-name').value.trim(),d=document.getElementById('product-description').value.trim(),p=parseFloat(document.getElementById('product-price').value),i=document.getElementById('product-image').value.trim();if(!n){alert('Nome!');return;}if(isNaN(p)||p<=0){alert('Prezzo!');return;}const o={name:n,description:d,price:p,image:i||`https://via.placeholder.com/300x200.png?text=${n.replace(/ /g,'+')}`};if(k){o.id=window.appData.products.find(x=>x.firebaseKey===k).id;update(ref(database,`products/${k}`),o).then(()=>alert('Aggiornato!')).catch(console.error);}else{o.id=window.appData.products.length>0?Math.max(0,...window.appData.products.map(x=>parseInt(x.id)||0))+1:1;push(ref(database,'products'),o).then(()=>alert('Aggiunto!')).catch(console.error);} hideProductForm();};
     window.deleteProduct=k=>{if(confirm('Eliminare?'))remove(ref(database,`products/${k}`)).then(()=>alert('Eliminato!')).catch(console.error);};
-    window.loadLocations=()=>{const l=document.getElementById('locations-loader'),c=document.getElementById('locationsList');if(l)l.style.display='block';if(c)c.innerHTML='';if(unsubscribeLocationsPage){unsubscribeLocationsPage();unsubscribeLocationsPage=null;} unsubscribeLocationsPage=onValue(ref(database,'locations'),s=>{const d=s.val();window.locations=d?Object.entries(d).map(([k,v])=>({...v,firebaseKey:k})):[];window.locations.sort((a,b)=>(parseInt(a.number)||0)-(parseInt(b.number)||0));if(c){if(window.locations.length===0)c.innerHTML="<p>Nessuna postazione.</p>";else c.innerHTML=`<table><thead><tr><th>Num.</th><th>Nome</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${window.locations.map(o=>{const sT=o.status==='available'?'Disponibile':o.status==='maintenance'?'Manutenzione':'Riservata';const sC=o.status==='available'?'completed':o.status==='maintenance'?'cancelled':'pending';return`<tr><td>${o.number}</td><td>${o.name}</td><td><span class="order-status ${sC}">${sT}</span></td><td style="white-space:nowrap;"><button onclick="editLocation('${o.firebaseKey}')" style="background-color:#1976D2;margin-right:5px;">Mod.</button><button onclick="deleteLocation('${o.firebaseKey}')" style="background-color:#c62828;">Elim.</button></td></tr>`;}).join('')}</tbody></table>`;} if(l)l.style.display='none';},e=>{console.error(e);if(c)c.innerHTML="<p class='error-message'>Errore postazioni</p>";if(l)l.style.display='none';if(unsubscribeLocationsPage){unsubscribeLocationsPage();unsubscribeLocationsPage=null;}});};
-    window.showLocationForm=(e=false,k=null)=>{const f=document.getElementById('location-form'),t=document.getElementById('location-form-title'),i=document.getElementById('location-id'),n=document.getElementById('location-number'),m=document.getElementById('location-name'),s=document.getElementById('location-status');if(!f||!t||!i||!n||!m||!s)return;f.style.display='block';t.textContent=e?'Modifica Postazione':'Aggiungi Postazione';i.value=k||'';if(e&&k){const o=window.locations.find(x=>x.firebaseKey===k);if(o){n.value=o.number;m.value=o.name;s.value=o.status||'available';}}else{n.value='';m.value='';s.value='available';}};
+    window.loadLocations=()=>{const l=document.getElementById('locations-loader'),c=document.getElementById('locationsList');if(l)l.style.display='block';if(c)c.innerHTML='';if(unsubscribeLocationsPage){unsubscribeLocationsPage();unsubscribeLocationsPage=null;} unsubscribeLocationsPage=onValue(ref(database,'locations'),s=>{const d=s.val();window.appData.locations=d?Object.entries(d).map(([k,v])=>({...v,firebaseKey:k})):[];window.appData.locations.sort((a,b)=>(parseInt(a.number)||0)-(parseInt(b.number)||0));if(c){if(window.appData.locations.length===0)c.innerHTML="<p>Nessuna postazione.</p>";else c.innerHTML=`<table><thead><tr><th>Num.</th><th>Nome</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${window.appData.locations.map(o=>{const sT=o.status==='available'?'Disponibile':o.status==='maintenance'?'Manutenzione':'Riservata';const sC=o.status==='available'?'completed':o.status==='maintenance'?'cancelled':'pending';return`<tr><td>${o.number}</td><td>${o.name}</td><td><span class="order-status ${sC}">${sT}</span></td><td style="white-space:nowrap;"><button onclick="editLocation('${o.firebaseKey}')" style="background-color:#1976D2;margin-right:5px;">Mod.</button><button onclick="deleteLocation('${o.firebaseKey}')" style="background-color:#c62828;">Elim.</button></td></tr>`;}).join('')}</tbody></table>`;} if(l)l.style.display='none';},e=>{console.error(e);if(c)c.innerHTML="<p class='error-message'>Errore postazioni</p>";if(l)l.style.display='none';if(unsubscribeLocationsPage){unsubscribeLocationsPage();unsubscribeLocationsPage=null;}});};
+    window.showLocationForm=(e=false,k=null)=>{const f=document.getElementById('location-form'),t=document.getElementById('location-form-title'),i=document.getElementById('location-id'),n=document.getElementById('location-number'),m=document.getElementById('location-name'),s=document.getElementById('location-status');if(!f||!t||!i||!n||!m||!s)return;f.style.display='block';t.textContent=e?'Modifica Postazione':'Aggiungi Postazione';i.value=k||'';if(e&&k){const o=window.appData.locations.find(x=>x.firebaseKey===k);if(o){n.value=o.number;m.value=o.name;s.value=o.status||'available';}}else{n.value='';m.value='';s.value='available';}};
     window.editLocation=k=>showLocationForm(true,k);window.hideLocationForm=()=>{if(document.getElementById('location-form'))document.getElementById('location-form').style.display='none';};
-    window.saveLocation=()=>{const k=document.getElementById('location-id').value,n=parseInt(document.getElementById('location-number').value),m=document.getElementById('location-name').value.trim(),s=document.getElementById('location-status').value;if(isNaN(n)||n<=0){alert('Numero!');return;}if(!m){alert('Nome!');return;}if(window.locations.find(o=>o.number===n&&o.firebaseKey!==k)){alert(`Num ${n} esiste.`);return;}const d={number:n,name:m,status:s};if(k)update(ref(database,`locations/${k}`),d).then(()=>alert('Aggiornata!')).catch(console.error);else push(ref(database,'locations'),d).then(()=>alert('Aggiunta!')).catch(console.error);hideLocationForm();};
+    window.saveLocation=()=>{const k=document.getElementById('location-id').value,n=parseInt(document.getElementById('location-number').value),m=document.getElementById('location-name').value.trim(),s=document.getElementById('location-status').value;if(isNaN(n)||n<=0){alert('Numero!');return;}if(!m){alert('Nome!');return;}if(window.appData.locations.find(o=>o.number===n&&o.firebaseKey!==k)){alert(`Num ${n} esiste.`);return;}const d={number:n,name:m,status:s};if(k)update(ref(database,`locations/${k}`),d).then(()=>alert('Aggiornata!')).catch(console.error);else push(ref(database,'locations'),d).then(()=>alert('Aggiunta!')).catch(console.error);hideLocationForm();};
     window.deleteLocation=k=>{if(confirm('Eliminare?'))remove(ref(database,`locations/${k}`)).then(()=>alert('Eliminata!')).catch(console.error);};
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -352,6 +532,44 @@
             showPage('dashboard-page');
         }
         const pI=document.getElementById('password'); if(pI)pI.addEventListener('keyup',(e)=>{if(e.key==='Enter')login();});
+        // Aggiungi wrapper per tabelle per lo scroll orizzontale
+        document.querySelectorAll('#productsList, #locationsList, #dashboard-stats, #revenue-data-container').forEach(el => {
+            if (el.querySelector('table')) { // Se c'è già una tabella, avvolgila (caso di revenue-data-container)
+                const table = el.querySelector('table');
+                if (!table.parentElement.classList.contains('table-responsive-wrapper')) {
+                     const wrapper = document.createElement('div');
+                     wrapper.className = 'table-responsive-wrapper';
+                     table.parentNode.insertBefore(wrapper, table);
+                     wrapper.appendChild(table);
+                }
+            } else { // Altrimenti, l'elemento stesso sarà il wrapper (caso di productsList, locationsList)
+                 if(!el.classList.contains('table-responsive-wrapper') && el.id !== 'dashboard-stats' && el.id !== 'revenue-data-container') { // dashboard-stats è speciale
+                    // el.classList.add('table-responsive-wrapper'); // Già aggiunto via CSS in caso di table interne
+                 }
+            }
+        });
+         // Per dashboard-stats, il wrapper va messo attorno alla tabella degli ultimi ordini
+        const dashboardStatsTableContainer = document.querySelector('#dashboard-stats');
+        if (dashboardStatsTableContainer) {
+            // Attendi che la tabella sia creata da loadDashboardData
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    if (mutation.addedNodes.length) {
+                        const table = dashboardStatsTableContainer.querySelector('table');
+                        if (table && !table.parentElement.classList.contains('table-responsive-wrapper')) {
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'table-responsive-wrapper';
+                            table.parentNode.insertBefore(wrapper, table);
+                            wrapper.appendChild(table);
+                            observer.disconnect(); // Trovata e avvolta, non serve più osservare
+                        }
+                    }
+                });
+            });
+            observer.observe(dashboardStatsTableContainer, { childList: true, subtree: true });
+        }
+
+
     });
 </script>
 </body>
