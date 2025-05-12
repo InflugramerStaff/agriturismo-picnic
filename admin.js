@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, push, set, update, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+//import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"; // Rimosso
 
-// **IMPORTANTE:** Inserisci qui la configurazione del tuo progetto Firebase (quella che hai copiato al Passo 1.2)
+// **IMPORTANTE:** Inserisci qui la configurazione del tuo progetto Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBAvAUrRTJzqKV23BD0A8Lai-8KiJ6KVZY",
   authDomain: "picnic-4467e.firebaseapp.com",
@@ -16,7 +16,7 @@ const firebaseConfig = {
 // Inizializza Firebase
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
-const auth = getAuth(app);
+//const auth = getAuth(app); // Rimosso
 
 // Variabili globali per i dati
 let orders = [];
@@ -33,88 +33,36 @@ function showNotification(message, type = 'success') {
 
     setTimeout(() => {
         notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300); // Remove after fade out
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// *** Autenticazione ***
-
-// Gestione del login
+// *** Autenticazione *** (Rimosso)
+/*
 const loginForm = document.getElementById('login-form');
 const loginContainer = document.getElementById('login-container');
 const dashboard = document.getElementById('dashboard');
 const loginButton = document.getElementById('login-button');
-const loginError = document.getElementById('loginError');
+const loginError = document.getElementById('login-error');
 
-loginButton.addEventListener('click', () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+loginButton.addEventListener('click', () => { ... });
 
-    console.log("Tentativo di accesso con email:", email, "e password:", password);  // Aggiunto per debug
+onAuthStateChanged(auth, (user) => { ... });
 
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Login successful (ma non sappiamo ancora se è admin)
-            console.log("Login riuscito!"); // Aggiunto per debug
-            loginError.style.display = 'none';
-        })
-        .catch((error) => {
-            console.error("Errore durante il login:", error);
-            loginError.textContent = "Email o password non validi";
-            loginError.style.display = 'block';
-        });
-});
+async function checkIfAdmin(uid) { ... }
 
-// Gestione dello stato di autenticazione (e verifica admin)
-onAuthStateChanged(auth, (user) => {
-    console.log("onAuthStateChanged attivato!", user); // Aggiunto per debug
-    if (user) {
-        // Utente loggato, verifica se è admin
-        checkIfAdmin(user.uid)
-            .then(isAdmin => {
-                console.log("checkIfAdmin restituisce:", isAdmin); // Aggiunto per debug
-                if (isAdmin) {
-                    // È un admin, mostra il dashboard
-                    loginContainer.style.display = 'none';
-                    dashboard.style.display = 'block';
-                    loadDashboardData();
-                    loadOrders();
-                    loadProducts();
-                    loadLocations();
-                } else {
-                    // Non è un admin, mostra errore e fai il logout
-                    showNotification("Non sei autorizzato ad accedere a questa pagina.", 'error');
-                    signOut(auth); // Forza il logout
-                }
-            });
-    } else {
-        // Utente non loggato, mostra il form di login
-        loginContainer.style.display = 'block';
-        dashboard.style.display = 'none';
-    }
-});
-
-// Funzione per verificare se un utente è admin
-async function checkIfAdmin(uid) {
-    console.log("checkIfAdmin chiamato con UID:", uid); // Aggiunto per debug
-    const adminRef = ref(database, `admins/${uid}`);
-    const snapshot = await get(adminRef);
-    const isAdmin = snapshot.exists() && snapshot.val() === true;
-    console.log("checkIfAdmin snapshot:", snapshot.val()); // Aggiunto per debug
-    return isAdmin;
-}
-
-// Gestione del logout
 const logoutButton = document.getElementById('logout-button');
-logoutButton.addEventListener('click', () => {
-    signOut(auth).then(() => {
-        // Logout successful (onAuthStateChanged gestirà la visualizzazione del form di login)
-        showNotification("Logout effettuato con successo.", 'success');
-    }).catch((error) => {
-        console.error("Errore durante il logout:", error);
-        showNotification("Errore durante il logout.", 'error');
-    });
-});
+logoutButton.addEventListener('click', () => { ... });
+*/
+
+// Mostra direttamente la dashboard e carica i dati
+window.onload = () => { // Assicurati che il DOM sia completamente caricato
+    document.getElementById('dashboard').style.display = 'block'; // Mostra il dashboard
+    loadDashboardData();
+    loadOrders();
+    loadProducts();
+    loadLocations();
+};
 
 // *** Navigazione Pagine ***
 
@@ -204,27 +152,27 @@ function loadDashboardData() {
                 const statsHTML = `
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
                         <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3>${pendingOrders}</h3>
-                            <p>Ordini in attesa</p>
-                        </div>
-                        <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3>${completedOrders}</h3>
+                            <h3><span class="math-inline">\{pendingOrders\}</h3\>
+<p\>Ordini in attesa</p\>
+</div\>
+<div class\="card" style\="text\-align\: center; padding\: 1rem;"\>
+<h3\></span>{completedOrders}</h3>
                             <p>Ordini completati</p>
                         </div>
                         <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3>${todayOrders}</h3>
-                            <p>Ordini di oggi</p>
-                        </div>
-                        <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3>€${totalRevenue.toFixed(2)}</h3>
+                            <h3><span class="math-inline">\{todayOrders\}</h3\>
+<p\>Ordini di oggi</p\>
+</div\>
+<div class\="card" style\="text\-align\: center; padding\: 1rem;"\>
+<h3\>€</span>{totalRevenue.toFixed(2)}</h3>
                             <p>Incasso totale</p>
                         </div>
                         <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3>${productsCount}</h3>
-                            <p>Prodotti attivi</p>
-                        </div>
-                        <div class="card" style="text-align: center; padding: 1rem;">
-                            <h3>${locationsCount}</h3>
+                            <h3><span class="math-inline">\{productsCount\}</h3\>
+<p\>Prodotti attivi</p\>
+</div\>
+<div class\="card" style\="text\-align\: center; padding\: 1rem;"\>
+<h3\></span>{locationsCount}</h3>
                             <p>Postazioni totali</p>
                         </div>
                     </div>
@@ -335,25 +283,25 @@ function displayOrders(orders) {
     let ordersHTML = '';
 
     orders.forEach(order => {
-        const statusText = order.status === 'pending' ? 'In attesa' : 
+        const statusText = order.status === 'pending' ? 'In attesa' :
                           order.status === 'completed' ? 'Completato' : 'Annullato';
 
         ordersHTML += `
             <div class="order-card">
                 <div class="order-header">
-                    <div class="order-id">${order.id}</div>
-                    <div class="order-date">${new Date(order.date).toLocaleString('it-IT')}</div>
-                    <div class="order-status ${order.status}">${statusText}</div>
+                    <div class="order-id"><span class="math-inline">\{order\.id\}</div\>
+<div class\="order\-date"\></span>{new Date(order.date).toLocaleString('it-IT')}</div>
+                    <div class="order-status <span class="math-inline">\{order\.status\}"\></span>{statusText}</div>
                 </div>
                 <div class="order-details">
                     <div class="order-customer">
                         <strong>Cliente:</strong> ${order.customer.name} | <strong>Telefono:</strong> ${order.customer.phone}
                     </div>
                     <div class="order-location">
-                        <strong>Postazione:</strong> ${order.location.name}
-                    </div>
-                    <div class="order-total">
-                        <strong>Totale:</strong> €${order.total.toFixed(2)}
+                        <strong>Postazione:</strong> <span class="math-inline">\{order\.location\.name\}
+</div\>
+<div class\="order\-total"\>
+<strong\>Totale\:</strong\> €</span>{order.total.toFixed(2)}
                     </div>
                     ${order.notes ? `<div class="order-notes"><strong>Note:</strong> ${order.notes}</div>` : ''}
                 </div>
@@ -388,10 +336,10 @@ function viewOrderDetails(orderKey) {
         const itemTotal = item.price * item.quantity;
         itemsHTML += `
             <tr>
-                <td>${item.name}</td>
-                <td>${item.quantity}</td>
-                <td>€${item.price.toFixed(2)}</td>
-                <td>€${itemTotal.toFixed(2)}</td>
+                <td><span class="math-inline">\{item\.name\}</td\>
+<td\></span>{item.quantity}</td>
+                <td>€<span class="math-inline">\{item\.price\.toFixed\(2\)\}</td\>
+<td\>€</span>{itemTotal.toFixed(2)}</td>
             </tr>
         `;
     });
@@ -400,18 +348,17 @@ function viewOrderDetails(orderKey) {
         <div style="margin-bottom: 1.5rem;">
             <p><strong>ID Ordine:</strong> ${order.id}</p>
             <p><strong>Data:</strong> ${new Date(order.date).toLocaleString('it-IT')}</p>
-            <p><strong>Stato:</strong> <span class="order-status ${order.status}">${statusText}</span></p>
+            <p><strong>Stato:</strong> <span class="order-status <span class="math-inline">\{order\.status\}"\></span>{statusText}</span></p>
         </div>
         
         <div style="margin-bottom: 1.5rem;">
             <h4>Informazioni Cliente</h4>
             <p><strong>Nome:</strong> ${order.customer.name}</p>
-            <p><strong>Telefono:</strong> ${order.customer.phone}</p>
-        </div>
-        
-        <div style="margin-bottom: 1.5rem;">
-            <h4>Postazione</h4>
-            <p>${order.location.name}</p>
+            <p><strong>Telefono:</strong> <span class="math-inline">\{order\.customer\.phone\}</p\>
+</div\>
+<div style\="margin\-bottom\: 1\.5rem;"\>
+<h4\>Postazione</h4\>
+<p\></span>{order.location.name}</p>
         </div>
         
         <div style="margin-bottom: 1.5rem;">
@@ -426,12 +373,12 @@ function viewOrderDetails(orderKey) {
                     </tr>
                 </thead>
                 <tbody>
-                    ${itemsHTML}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" style="text-align: right;"><strong>Totale Ordine:</strong></td>
-                        <td><strong>€${order.total.toFixed(2)}</strong></td>
+                    <span class="math-inline">\{itemsHTML\}
+</tbody\>
+<tfoot\>
+<tr\>
+<td colspan\="3" style\="text\-align\: right;"\><strong\>Totale Ordine\:</strong\></td\>
+<td\><strong\>€</span>{order.total.toFixed(2)}</strong></td>
                     </tr>
                 </tfoot>
             </table>
@@ -523,13 +470,13 @@ function loadProducts() {
             products.forEach(product => {
                 productsHTML += `
                     <tr>
-                        <td>${product.id}</td>
-                        <td>${product.name}</td>
-                        <td>${product.description}</td>
-                        <td>€${product.price.toFixed(2)}</td>
+                        <td><span class="math-inline">\{product\.id\}</td\>
+<td\></span>{product.name}</td>
+                        <td><span class="math-inline">\{product\.description\}</td\>
+<td\>€</span>{product.price.toFixed(2)}</td>
                         <td style="white-space: nowrap;">
-                            <button onclick="editProduct('${product.firebaseKey}')" style="background-color: #1976D2;">Modifica</button>
-                            <button onclick="deleteProduct('${product.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
+                            <button onclick="editProduct('<span class="math-inline">\{product\.firebaseKey\}'\)" style\="background\-color\: \#1976D2;"\>Modifica</button\>
+<button onclick\="deleteProduct\('</span>{product.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
                         </td>
                     </tr>
                 `;
@@ -718,144 +665,7 @@ function loadLocations() {
 
                 locationsHTML += `
                     <tr>
-                        <td>${location.number}</td>
-                        <td>${location.name}</td>
-                        <td><span class="order-status ${statusClass}">${statusText}</span></td>
+                        <td><span class="math-inline">\{location\.number\}</td\>
+<td\></span>{location.name}</td>
+                        <td><span class="order-status <span class="math-inline">\{statusClass\}"\></span>{statusText}</span></td>
                         <td style="white-space: nowrap;">
-                            <button onclick="editLocation('${location.firebaseKey}')" style="background-color: #1976D2;">Modifica</button>
-                            <button onclick="deleteLocation('${location.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            locationsHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            locationsList.innerHTML = locationsHTML;
-        }
-
-        loader.style.display = 'none';
-    });
-};
-
-// Mostra form postazione (per aggiunta)
-function showLocationForm() {
-    document.getElementById('location-form').style.display = 'block';
-    document.getElementById('location-form-title').textContent = 'Aggiungi Nuova Postazione';
-    document.getElementById('location-id').value = '';
-    document.getElementById('location-number').value = '';
-    document.getElementById('location-name').value = '';
-    document.getElementById('location-status').value = 'available';
-};
-
-// Nascondi form postazione
-function hideLocationForm() {
-    document.getElementById('location-form').style.display = 'none';
-};
-
-// Prepara form per modifica postazione
-function editLocation(locationKey) {
-    const location = locations.find(l => l.firebaseKey === locationKey);
-
-    if (!location) return;
-
-    document.getElementById('location-form-title').textContent = 'Modifica Postazione';
-    document.getElementById('location-id').value = locationKey;
-    document.getElementById('location-number').value = location.number;
-    document.getElementById('location-name').value = location.name;
-    document.getElementById('location-status').value = location.status || 'available';
-
-    document.getElementById('location-form').style.display = 'block';
-};
-
-// Salva postazione (nuova o esistente)
-function saveLocation() {
-    const locationKey = document.getElementById('location-id').value;
-    const number = parseInt(document.getElementById('location-number').value);
-    const name = document.getElementById('location-name').value;
-    const status = document.getElementById('location-status').value;
-
-    // Validazione
-    if (isNaN(number) || number <= 0) {
-        showNotification('Il numero della postazione deve essere un numero maggiore di zero!', 'error');
-        return;
-    }
-
-    if (!name) {
-        showNotification('Il nome/descrizione della postazione è obbligatorio!', 'error');
-        return;
-    }
-
-    // Verifica che non ci sia già una postazione con lo stesso numero
-    if (!locationKey) {
-        const existingLocation = locations.find(l => l.number === number);
-        if (existingLocation) {
-            showNotification(`Esiste già una postazione con il numero ${number}. Scegli un altro numero!`, 'error');
-            return;
-        }
-    }
-
-    // Prepara la postazione
-    const location = {
-        number: number,
-        name: name,
-        status: status
-    };
-
-    let locationRef;
-
-    if (locationKey) {
-        // Aggiornamento postazione esistente
-        locationRef = ref(database, `locations/${locationKey}`);
-        update(locationRef, location)
-            .then(() => {
-                showNotification('Postazione aggiornata con successo!');
-                hideLocationForm();
-            })
-            .catch((error) => {
-                console.error("Errore durante l'aggiornamento della postazione:", error);
-                showNotification("Si è verificato un errore durante l'aggiornamento della postazione.", 'error');
-            });
-    } else {
-        // Aggiunta nuova postazione
-        locationRef = ref(database, 'locations');
-        push(locationRef, location)
-            .then(() => {
-                showNotification('Nuova postazione aggiunta con successo!');
-                hideLocationForm();
-            })
-            .catch((error) => {
-                console.error("Errore durante l'aggiunta della postazione:", error);
-                showNotification("Si è verificato un errore durante l'aggiunta della postazione.", 'error');
-            });
-    }
-};
-
-// Elimina postazione
-function deleteLocation(locationKey) {
-    if (confirm('Sei sicuro di voler eliminare questa postazione?')) {
-        const locationRef = ref(database, `locations/${locationKey}`);
-
-        remove(locationRef)
-            .then(() => {
-                showNotification('Postazione eliminata con successo!');
-            })
-            .catch((error) => {
-                console.error("Errore durante l'eliminazione della postazione:", error);
-                showNotification("Si è verificato un errore durante l'eliminazione della postazione.", 'error');
-            });
-    }
-};
-
-// Inizializza la pagina caricando i dati del dashboard all'apertura
-document.addEventListener('DOMContentLoaded', function() {
-    // Aggiungiamo un ascoltatore per il tasto Invio nella pagina di login
-    document.getElementById('password').addEventListener('keyup', function(event) {
-        if (event.key === 'Enter') {
-            loginButton.click(); // Simula un click sul pulsante di login
-        }
-    });
-});
