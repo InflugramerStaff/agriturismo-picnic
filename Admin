@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Amministrativa - Gestione Picnic</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #5A6F41;
+            --primary-dark: #3F4F2D;
+            --primary-light: #8A9F71;
+            --secondary-color: #9B7E58;
+            --secondary-dark: #7A5E38;
+            --secondary-light: #BBA485;
+            --background-color: #F5F2E9;
+            --background-light: #FAF7F0;
+            --accent-color: #A4BC7B;
+            --text-color: #38301E;
+            --text-light: #6D6151;
+            --white: #FFFFFF;
+            --shadow: 0 4px 12px rgba(59, 50, 35, 0.08);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            text-align: center;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 1rem;
+        }
+
+        .sidebar {
+            background-color: var(--white);
+            padding: 1rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 0.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--primary-light);
+            color: var(--white);
+        }
+
+        .content {
+            background-color: var(--white);
+            padding: 1rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e53935;
+            padding: 1rem;
+            background-color: #ffebee;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--background-light);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: rgba(90, 111, 65, 0.1);
+        }
+
+        .card {
+            background-color: var(--background-light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-status.pending {
+            background-color: #fff9c4;
+            color: #f57f17;
+        }
+
+        .order-status.completed {
+            background-color: #e8f5e9;
+            color: #2E7D32;
+        }
+
+        .order-status.cancelled {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+         .charts-container {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+        .chart-card {
+            background-color: var(--background-light); /* Usa var(--white) o var(--background-light) a seconda della preferenza */
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            /* Altezza minima per i grafici per evitare che siano troppo piccoli */
+            min-height: 300px; 
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-card h4 {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+         .order-card { /* Stile per le card degli ordini nella pagina ordini */
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid var(--primary-color);
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .order-id {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+        }
+        .order-date {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        .order-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        .order-details > div {
+            margin-bottom: 0.5rem;
+        }
+        .order-customer, .order-location, .order-total, .order-notes {
+            font-size: 0.95rem;
+        }
+        .order-actions {
+            margin-top: 1rem;
+            text-align: right;
+        }
+        .order-actions button {
+            margin-left: 0.5rem;
+        }
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-column {
+            flex: 1;
+        }
+        .product-form {
+             background-color: var(--background-light);
+             padding: 1.5rem;
+             border-radius: var(--radius);
+             margin-bottom: 1.5rem;
+             box-shadow: var(--shadow);
+        }
+    </style>
+</head>
+<body>
+    <div id="login" class="login-container">
+        <h2>Accesso Area Amministrativa</h2>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Inserisci il tuo username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Inserisci la tua password">
+        </div>
+        <button onclick="login()">Accedi</button>
+        <div id="loginError" style="color: red; margin-top: 1rem; display: none;"></div>
+    </div>
+    
+    <div id="dashboard" style="display: none;">
+        <header>
+            <h1>Area Amministrativa - Gestione Picnic</h1>
+        </header>
+        
+        <div class="container">
+            <div class="dashboard">
+                <div class="sidebar">
+                    <h3>Menu</h3>
+                    <ul class="sidebar-menu">
+                        <li><a class="active" onclick="showPage('dashboard-page')">Dashboard</a></li>
+                        <li><a onclick="showPage('orders-page')">Ordini</a></li>
+                        <li><a onclick="showPage('products-page')">Prodotti</a></li>
+                        <li><a onclick="showPage('locations-page')">Postazioni</a></li>
+                        <li><a onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+                
+                <div class="content">
+                    <div id="dashboard-page" class="page active">
+                        <h2>Dashboard</h2>
+                        <p>Benvenuto nell'area amministrativa del sistema di ordinazione picnic.</p>
+                        <div id="dashboard-stats">
+                            <div class="loader" id="dashboard-loader"></div>
+                            </div>
+
+                        <div id="charts-section" style="margin-top: 2rem;">
+                            <h3 style="margin-bottom: 1rem;">Andamento Ordini e Fatturato</h3>
+                            <div class="charts-container">
+                                <div class="chart-card">
+                                    <h4>Ordini Settimanali</h4>
+                                    <canvas id="weeklyOrdersChart"></canvas>
+                                </div>
+                                <div class="chart-card">
+                                    <h4>Fatturato Settimanale (€)</h4>
+                                    <canvas id="weeklyRevenueChart"></canvas>
+                                </div>
+                                <div class="chart-card">
+                                    <h4>Ordini Mensili</h4>
+                                    <canvas id="monthlyOrdersChart"></canvas>
+                                </div>
+                                <div class="chart-card">
+                                    <h4>Fatturato Mensile (€)</h4>
+                                    <canvas id="monthlyRevenueChart"></canvas>
+                                </div>
+                                <div class="chart-card">
+                                    <h4>Ordini Annuali</h4>
+                                    <canvas id="annualOrdersChart"></canvas>
+                                </div>
+                                <div class="chart-card">
+                                    <h4>Fatturato Annuale (€)</h4>
+                                    <canvas id="annualRevenueChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="orders-page" class="page">
+                        <h2>Gestione Ordini</h2>
+                        <div id="orders-filters" class="form-row" style="align-items: flex-end; margin-bottom: 1.5rem;">
+                            <div class="form-column">
+                                <label for="order-status-filter">Filtra per stato:</label>
+                                <select id="order-status-filter" onchange="filterOrders()">
+                                    <option value="all">Tutti gli ordini</option>
+                                    <option value="pending">In attesa</option>
+                                    <option value="completed">Completati</option>
+                                    <option value="cancelled">Annullati</option>
+                                </select>
+                            </div>
+                            <div class="form-column">
+                                <label for="order-date-filter">Filtra per data:</label>
+                                <input type="date" id="order-date-filter" onchange="filterOrders()">
+                            </div>
+                             <div class="form-column" style="flex: 0 0 auto;">
+                                <button onclick="clearOrderFilters()">Rimuovi Filtri</button>
+                            </div>
+                        </div>
+                        <div id="ordersList">
+                            <div class="loader" id="orders-loader"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="products-page" class="page">
+                        <h2>Gestione Prodotti</h2>
+                        <button onclick="showProductForm()" style="margin-bottom: 1rem;">Aggiungi Nuovo Prodotto</button>
+                        
+                        <div id="product-form" class="product-form" style="display: none;">
+                            <h3 id="product-form-title">Aggiungi Nuovo Prodotto</h3>
+                            <input type="hidden" id="product-id">
+                            <div class="form-group">
+                                <label for="product-name">Nome Prodotto:</label>
+                                <input type="text" id="product-name" placeholder="Nome del prodotto">
+                            </div>
+                            <div class="form-group">
+                                <label for="product-description">Descrizione:</label>
+                                <textarea id="product-description" rows="3" placeholder="Descrizione del prodotto"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-column">
+                                    <label for="product-price">Prezzo (€):</label>
+                                    <input type="number" id="product-price" step="0.01" min="0" placeholder="0.00">
+                                </div>
+                                <div class="form-column">
+                                    <label for="product-image">URL Immagine:</label>
+                                    <input type="text" id="product-image" placeholder="https://...">
+                                </div>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <button onclick="saveProduct()">Salva Prodotto</button>
+                                <button onclick="hideProductForm()" style="background-color: #757575;">Annulla</button>
+                            </div>
+                        </div>
+                        
+                        <div id="productsList">
+                            <div class="loader" id="products-loader"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="locations-page" class="page">
+                        <h2>Gestione Postazioni</h2>
+                        <button onclick="showLocationForm()" style="margin-bottom: 1rem;">Aggiungi Nuova Postazione</button>
+                        
+                        <div id="location-form" class="product-form" style="display: none;">
+                            <h3 id="location-form-title">Aggiungi Nuova Postazione</h3>
+                            <input type="hidden" id="location-id">
+                            <div class="form-row">
+                                <div class="form-column">
+                                    <label for="location-number">Numero Postazione:</label>
+                                    <input type="number" id="location-number" min="1" placeholder="1">
+                                </div>
+                                <div class="form-column">
+                                    <label for="location-name">Nome/Descrizione:</label>
+                                    <input type="text" id="location-name" placeholder="Es: Sotto il grande ulivo">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="location-status">Stato:</label>
+                                <select id="location-status">
+                                    <option value="available">Disponibile</option>
+                                    <option value="maintenance">In Manutenzione</option>
+                                    <option value="reserved">Riservata</option>
+                                </select>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <button onclick="saveLocation()">Salva Postazione</button>
+                                <button onclick="hideLocationForm()" style="background-color: #757575;">Annulla</button>
+                            </div>
+                        </div>
+                        
+                        <div id="locationsList">
+                            <div class="loader" id="locations-loader"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="orderModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 100; overflow-y: auto;">
+        <div style="background-color: white; width: 80%; max-width: 800px; margin: 50px auto; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <h3>Dettagli Ordine</h3>
+            <div id="orderModalContent"></div>
+            <div style="text-align: right; margin-top: 1rem;">
+                <button onclick="document.getElementById('orderModal').style.display = 'none';">Chiudi</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Importa le librerie Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, push, set, update, remove, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        
+        // Configurazione Firebase
+        const firebaseConfig = {
+            databaseURL: "https://picnic-4467e-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+        
+        // Inizializza Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Credenziali amministratore
+        window.ADMIN_USERNAME = "admin";
+        window.ADMIN_PASSWORD = "admin123";
+        
+        // Variabili per tracking delle risorse
+        window.orders = [];
+        window.products = [];
+        window.locations = [];
+        
+        // Funzione di login
+        window.login = function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginError = document.getElementById('loginError');
+            
+            if (username === window.ADMIN_USERNAME && password === window.ADMIN_PASSWORD) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                localStorage.setItem('isAdminLoggedIn', 'true'); // Salva lo stato del login
+                showPage('dashboard-page'); // Carica la dashboard e i suoi dati
+            } else {
+                loginError.textContent = 'Username o password non validi';
+                loginError.style.display = 'block';
+            }
+        };
+        
+        // Funzione di logout
+        window.logout = function() {
+            localStorage.removeItem('isAdminLoggedIn'); // Rimuovi lo stato del login
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        };
+        
+        // Funzione per mostrare una pagina del dashboard
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('onclick').includes(pageId)) {
+                    link.classList.add('active');
+                }
+            });
+            
+            if (pageId === 'dashboard-page') {
+                loadDashboardData();
+            } else if (pageId === 'orders-page') {
+                loadOrders();
+            } else if (pageId === 'products-page') {
+                loadProducts();
+            } else if (pageId === 'locations-page') {
+                loadLocations();
+            }
+        };
+        
+        /*** DASHBOARD FUNCTIONS ***/
+        
+        // Helper function per ottenere l'inizio della settimana (Lunedì)
+        function getStartOfWeek(date) {
+            const dt = new Date(date.valueOf());
+            const day = dt.getDay(); // 0 per Domenica, 1 per Lunedì, ..., 6 per Sabato
+            const diff = dt.getDate() - day + (day === 0 ? -6 : 1); // Aggiusta per Lunedì
+            const monday = new Date(dt.setDate(diff));
+            monday.setHours(0, 0, 0, 0);
+            return monday;
+        }
+
+        window.chartInstances = {}; // Memorizza le istanze dei grafici
+
+        function destroyChart(chartId) {
+            if (window.chartInstances[chartId]) {
+                window.chartInstances[chartId].destroy();
+                delete window.chartInstances[chartId];
+            }
+        }
+
+        function createOrUpdateChart(ctx, chartId, chartType, labels, datasets, options = {}) {
+            destroyChart(chartId); // Distrugge il grafico precedente se esiste
+            if (ctx) { // Assicurati che il contesto esista
+                 window.chartInstances[chartId] = new Chart(ctx, {
+                    type: chartType,
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, // Permette al grafico di non mantenere l'aspect ratio originale
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: 'var(--text-color)' // Colore dei tick dell'asse Y
+                                },
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)' // Colore della griglia Y
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: 'var(--text-color)' // Colore dei tick dell'asse X
+                                },
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)' // Colore della griglia X
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: 'var(--text-color)' // Colore delle etichette della legenda
+                                }
+                            }
+                        },
+                        ...options // Unisci eventuali opzioni aggiuntive
+                    }
+                });
+            } else {
+                console.error(`Contesto non trovato per il grafico: ${chartId}`);
+            }
+        }
+
+        window.loadDashboardData = function() {
+            const loader = document.getElementById('dashboard-loader');
+            if(loader) loader.style.display = 'block';
+            
+            const statsContainer = document.getElementById('dashboard-stats');
+            const chartsSection = document.getElementById('charts-section');
+            if(statsContainer) statsContainer.innerHTML = ''; // Pulisci statistiche precedenti
+            if(chartsSection) chartsSection.style.display = 'none'; // Nascondi grafici durante il caricamento
+
+
+            const ordersRef = ref(database, 'orders');
+            
+            onValue(ordersRef, (snapshot) => {
+                const data = snapshot.val();
+                const orders = data ? Object.values(data).map(order => ({...order, date: new Date(order.date)})) : [];
+                
+                const pendingOrders = orders.filter(order => order.status === 'pending').length;
+                const completedOrders = orders.filter(order => order.status === 'completed').length;
+                const totalRevenue = orders
+                    .filter(order => order.status !== 'cancelled')
+                    .reduce((sum, order) => sum + (order.total || 0), 0);
+                
+                const productsRef = ref(database, 'products');
+                const locationsRef = ref(database, 'locations');
+                
+                Promise.all([get(productsRef), get(locationsRef)]).then(([productsSnapshot, locationsSnapshot]) => {
+                    const productsCount = productsSnapshot.exists() ? Object.keys(productsSnapshot.val()).length : 0;
+                    const locationsCount = locationsSnapshot.exists() ? Object.keys(locationsSnapshot.val()).length : 0;
+                    
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    const todayOrders = orders.filter(order => {
+                        const orderDate = new Date(order.date);
+                        orderDate.setHours(0, 0, 0, 0);
+                        return orderDate.getTime() === today.getTime();
+                    }).length;
+                    
+                    if (statsContainer) {
+                        const statsHTML = `
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                                <div class="card" style="text-align: center; padding: 1rem;"><h3>${pendingOrders}</h3><p>Ordini in attesa</p></div>
+                                <div class="card" style="text-align: center; padding: 1rem;"><h3>${completedOrders}</h3><p>Ordini completati</p></div>
+                                <div class="card" style="text-align: center; padding: 1rem;"><h3>${todayOrders}</h3><p>Ordini di oggi</p></div>
+                                <div class="card" style="text-align: center; padding: 1rem;"><h3>€${totalRevenue.toFixed(2)}</h3><p>Incasso totale</p></div>
+                                <div class="card" style="text-align: center; padding: 1rem;"><h3>${productsCount}</h3><p>Prodotti attivi</p></div>
+                                <div class="card" style="text-align: center; padding: 1rem;"><h3>${locationsCount}</h3><p>Postazioni totali</p></div>
+                            </div>
+                            <h3 style="margin-top: 2rem;">Ultimi Ordini (max 5)</h3>
+                            <table>
+                                <thead><tr><th>ID Ordine</th><th>Cliente</th><th>Totale</th><th>Stato</th><th>Data</th></tr></thead>
+                                <tbody>
+                                    ${orders.sort((a,b) => b.date - a.date).slice(0, 5).map(order => `
+                                        <tr>
+                                            <td>${order.id}</td>
+                                            <td>${order.customer.name}</td>
+                                            <td>€${(order.total || 0).toFixed(2)}</td>
+                                            <td><span class="order-status ${order.status}">${order.status === 'pending' ? 'In attesa' : order.status === 'completed' ? 'Completato' : 'Annullato'}</span></td>
+                                            <td>${order.date.toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                        statsContainer.innerHTML = statsHTML;
+                    }
+                    
+                    // --- AGGREGAZIONE DATI PER I GRAFICI ---
+                    const weeklyData = {}; 
+                    const monthlyData = {}; 
+                    const yearlyData = {};  
+
+                    const validOrders = orders.filter(order => order.status !== 'cancelled' && order.date); // Assicurati che la data esista
+
+                    validOrders.forEach(order => {
+                        const orderDate = order.date; 
+                        const revenue = order.total || 0;
+                        const year = orderDate.getFullYear();
+
+                        // Settimanale
+                        const startOfWeek = getStartOfWeek(orderDate);
+                        const weeklyKey = `${startOfWeek.getFullYear()}-${String(startOfWeek.getMonth() + 1).padStart(2, '0')}-${String(startOfWeek.getDate()).padStart(2, '0')}`;
+                        weeklyData[weeklyKey] = weeklyData[weeklyKey] || { orders: 0, revenue: 0, dateObject: startOfWeek };
+                        weeklyData[weeklyKey].orders++;
+                        weeklyData[weeklyKey].revenue += revenue;
+                        
+                        // Mensile
+                        const month = String(orderDate.getMonth() + 1).padStart(2, '0');
+                        const monthlyKey = `${year}-${month}`;
+                        monthlyData[monthlyKey] = monthlyData[monthlyKey] || { orders: 0, revenue: 0 };
+                        monthlyData[monthlyKey].orders++;
+                        monthlyData[monthlyKey].revenue += revenue;
+
+                        // Annuale
+                        const yearlyKey = `${year}`;
+                        yearlyData[yearlyKey] = yearlyData[yearlyKey] || { orders: 0, revenue: 0 };
+                        yearlyData[yearlyKey].orders++;
+                        yearlyData[yearlyKey].revenue += revenue;
+                    });
+                    
+                    if(chartsSection) chartsSection.style.display = 'block'; // Mostra la sezione grafici
+
+                    // Dati Settimanali (ordinati per data)
+                    const sortedWeeklyKeys = Object.keys(weeklyData).sort((a,b) => weeklyData[a].dateObject - weeklyData[b].dateObject);
+                    const weeklyLabels = sortedWeeklyKeys.map(key => {
+                         const date = weeklyData[key].dateObject;
+                         return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+                    });
+                    const weeklyOrdersValues = sortedWeeklyKeys.map(key => weeklyData[key].orders);
+                    const weeklyRevenueValues = sortedWeeklyKeys.map(key => weeklyData[key].revenue);
+
+                    createOrUpdateChart(document.getElementById('weeklyOrdersChart')?.getContext('2d'), 'weeklyOrdersChart', 'line', weeklyLabels, 
+                        [{ label: 'Numero di Ordini', data: weeklyOrdersValues, borderColor: 'var(--primary-color)', backgroundColor: 'rgba(90, 111, 65, 0.2)', tension: 0.1, fill: true }]
+                    );
+                    createOrUpdateChart(document.getElementById('weeklyRevenueChart')?.getContext('2d'), 'weeklyRevenueChart', 'line', weeklyLabels, 
+                        [{ label: 'Fatturato (€)', data: weeklyRevenueValues, borderColor: 'var(--accent-color)', backgroundColor: 'rgba(164, 188, 123, 0.2)', tension: 0.1, fill: true }],
+                        { scales: { y: { ticks: { callback: function(value) { return '€' + value.toFixed(2); } } } } }
+                    );
+
+                    const monthlyLabels = Object.keys(monthlyData).sort();
+                    const monthlyOrdersValues = monthlyLabels.map(key => monthlyData[key].orders);
+                    const monthlyRevenueValues = monthlyLabels.map(key => monthlyData[key].revenue);
+
+                    createOrUpdateChart(document.getElementById('monthlyOrdersChart')?.getContext('2d'), 'monthlyOrdersChart', 'bar', monthlyLabels, 
+                        [{ label: 'Numero di Ordini', data: monthlyOrdersValues, backgroundColor: 'var(--primary-light)' }]
+                    );
+                    createOrUpdateChart(document.getElementById('monthlyRevenueChart')?.getContext('2d'), 'monthlyRevenueChart', 'bar', monthlyLabels, 
+                        [{ label: 'Fatturato (€)', data: monthlyRevenueValues, backgroundColor: 'var(--secondary-light)' }],
+                         { scales: { y: { ticks: { callback: function(value) { return '€' + value.toFixed(2); } } } } }
+                    );
+
+                    const annualLabels = Object.keys(yearlyData).sort();
+                    const annualOrdersValues = annualLabels.map(key => yearlyData[key].orders);
+                    const annualRevenueValues = annualLabels.map(key => yearlyData[key].revenue);
+                    
+                    createOrUpdateChart(document.getElementById('annualOrdersChart')?.getContext('2d'), 'annualOrdersChart', 'bar', annualLabels, 
+                        [{ label: 'Numero di Ordini', data: annualOrdersValues, backgroundColor: 'var(--primary-dark)' }]
+                    );
+                    createOrUpdateChart(document.getElementById('annualRevenueChart')?.getContext('2d'), 'annualRevenueChart', 'bar', annualLabels, 
+                        [{ label: 'Fatturato (€)', data: annualRevenueValues, backgroundColor: 'var(--secondary-dark)' }],
+                         { scales: { y: { ticks: { callback: function(value) { return '€' + value.toFixed(2); } } } } }
+                    );
+
+                    if(loader) loader.style.display = 'none';
+                }).catch(error => {
+                    console.error("Errore nel caricare dati aggiuntivi per il dashboard:", error);
+                    if(statsContainer) statsContainer.innerHTML = '<p class="error-message">Errore nel caricare i dati del dashboard.</p>';
+                    if(loader) loader.style.display = 'none';
+                    if(chartsSection) chartsSection.style.display = 'none';
+                });
+            }, (error) => {
+                console.error("Errore nel caricare gli ordini:", error);
+                if(statsContainer) statsContainer.innerHTML = '<p class="error-message">Errore nel caricare i dati degli ordini.</p>';
+                if(loader) loader.style.display = 'none';
+                if(chartsSection) chartsSection.style.display = 'none';
+            });
+        };
+        
+        /*** ORDERS FUNCTIONS ***/
+         window.clearOrderFilters = function() {
+            document.getElementById('order-status-filter').value = 'all';
+            document.getElementById('order-date-filter').value = '';
+            filterOrders();
+        };
+        
+        window.loadOrders = function() {
+            const loader = document.getElementById('orders-loader');
+            if(loader) loader.style.display = 'block';
+            
+            const ordersListEl = document.getElementById('ordersList');
+            if(ordersListEl) ordersListEl.innerHTML = ''; // Pulisci la lista
+            
+            const ordersRef = ref(database, 'orders');
+            
+            onValue(ordersRef, (snapshot) => {
+                const data = snapshot.val();
+                window.orders = data ? Object.entries(data).map(([key, value]) => ({
+                    ...value,
+                    firebaseKey: key,
+                    date: new Date(value.date) // Assicura che la data sia un oggetto Date
+                })) : [];
+                
+                window.orders.sort((a, b) => b.date - a.date); // Ordina per data più recente
+                
+                filterOrders(); // Applica i filtri e visualizza
+                
+                if(loader) loader.style.display = 'none';
+            }, (error) => {
+                console.error("Errore caricamento ordini:", error);
+                if(ordersListEl) ordersListEl.innerHTML = "<p class='error-message'>Errore nel caricamento degli ordini.</p>";
+                if(loader) loader.style.display = 'none';
+            });
+        };
+        
+        window.filterOrders = function() {
+            const statusFilter = document.getElementById('order-status-filter').value;
+            const dateFilterValue = document.getElementById('order-date-filter').value;
+            
+            let filteredOrders = [...window.orders];
+            
+            if (statusFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
+            }
+            
+            if (dateFilterValue) {
+                const filterDate = new Date(dateFilterValue);
+                filterDate.setHours(0, 0, 0, 0); // Normalizza per confrontare solo la data
+                
+                filteredOrders = filteredOrders.filter(order => {
+                    const orderDate = new Date(order.date);
+                    orderDate.setHours(0, 0, 0, 0); // Normalizza per confrontare solo la data
+                    return orderDate.getTime() === filterDate.getTime();
+                });
+            }
+            
+            displayOrders(filteredOrders);
+        };
+        
+        window.displayOrders = function(ordersToDisplay) {
+            const ordersListEl = document.getElementById('ordersList');
+            if (!ordersListEl) return;
+
+            if (ordersToDisplay.length === 0) {
+                ordersListEl.innerHTML = '<p>Nessun ordine trovato con i filtri selezionati.</p>';
+                return;
+            }
+            
+            let ordersHTML = '';
+            ordersToDisplay.forEach(order => {
+                const statusText = order.status === 'pending' ? 'In attesa' : 
+                                  order.status === 'completed' ? 'Completato' : 
+                                  order.status === 'cancelled' ? 'Annullato' : order.status;
+                
+                ordersHTML += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-id">Ordine #${order.id}</div>
+                            <div class="order-date">${order.date.toLocaleString('it-IT', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                            <span class="order-status ${order.status}">${statusText}</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-customer">
+                                <strong>Cliente:</strong> ${order.customer.name} | <strong>Tel:</strong> ${order.customer.phone}
+                            </div>
+                            <div class="order-location">
+                                <strong>Postazione:</strong> ${order.location.name} (Nr: ${order.location.number})
+                            </div>
+                            <div class="order-total">
+                                <strong>Totale:</strong> €${(order.total || 0).toFixed(2)}
+                            </div>
+                            ${order.notes ? `<div class="order-notes"><strong>Note:</strong> ${order.notes}</div>` : ''}
+                        </div>
+                        <div class="order-actions">
+                            <button onclick="viewOrderDetails('${order.firebaseKey}')">Dettagli</button>
+                            ${order.status === 'pending' ? `
+                                <button onclick="updateOrderStatus('${order.firebaseKey}', 'completed')" style="background-color: var(--primary-dark);">Completa</button>
+                                <button onclick="updateOrderStatus('${order.firebaseKey}', 'cancelled')" style="background-color: #c62828;">Annulla</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            ordersListEl.innerHTML = ordersHTML;
+        };
+        
+        window.viewOrderDetails = function(orderKey) {
+            const order = window.orders.find(o => o.firebaseKey === orderKey);
+            if (!order) return;
+            
+            const modal = document.getElementById('orderModal');
+            const modalContent = document.getElementById('orderModalContent');
+            
+            const statusText = order.status === 'pending' ? 'In attesa' : 
+                              order.status === 'completed' ? 'Completato' : 'Annullato';
+            
+            let itemsHTML = '';
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    const itemTotal = (item.price || 0) * (item.quantity || 0);
+                    itemsHTML += `
+                        <tr>
+                            <td>${item.name || 'N/D'}</td>
+                            <td>${item.quantity || 0}</td>
+                            <td>€${(item.price || 0).toFixed(2)}</td>
+                            <td>€${itemTotal.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            modalContent.innerHTML = `
+                <div style="margin-bottom: 1.5rem;">
+                    <p><strong>ID Ordine:</strong> ${order.id}</p>
+                    <p><strong>Data:</strong> ${order.date.toLocaleString('it-IT')}</p>
+                    <p><strong>Stato:</strong> <span class="order-status ${order.status}">${statusText}</span></p>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <h4>Informazioni Cliente</h4>
+                    <p><strong>Nome:</strong> ${order.customer.name}</p>
+                    <p><strong>Telefono:</strong> ${order.customer.phone}</p>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <h4>Postazione</h4>
+                    <p>${order.location.name} (Numero: ${order.location.number})</p>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <h4>Prodotti Ordinati</h4>
+                    <table>
+                        <thead><tr><th>Prodotto</th><th>Quantità</th><th>Prezzo Unit.</th><th>Totale</th></tr></thead>
+                        <tbody>${itemsHTML}</tbody>
+                        <tfoot><tr><td colspan="3" style="text-align: right;"><strong>Totale Ordine:</strong></td><td><strong>€${(order.total || 0).toFixed(2)}</strong></td></tr></tfoot>
+                    </table>
+                </div>
+                ${order.notes ? `<div style="margin-bottom: 1.5rem;"><h4>Note</h4><p>${order.notes}</p></div>` : ''}
+                ${order.status === 'pending' ? `
+                <div style="text-align: right; margin-top: 1rem;">
+                    <button onclick="updateOrderStatus('${order.firebaseKey}', 'completed')" style="background-color: var(--primary-dark);">Completa Ordine</button>
+                    <button onclick="updateOrderStatus('${order.firebaseKey}', 'cancelled')" style="background-color: #c62828;">Annulla Ordine</button>
+                </div>
+                ` : ''}
+            `;
+            modal.style.display = 'block';
+        };
+        
+        window.updateOrderStatus = function(orderKey, newStatus) {
+            const orderRef = ref(database, `orders/${orderKey}`);
+            update(orderRef, { status: newStatus })
+                .then(() => {
+                    document.getElementById('orderModal').style.display = 'none';
+                    alert(`Stato dell'ordine aggiornato a: ${newStatus === 'completed' ? 'Completato' : 'Annullato'}`);
+                    // loadOrders(); // Ricarica gli ordini per aggiornare la vista
+                })
+                .catch((error) => {
+                    console.error("Errore aggiornamento stato ordine:", error);
+                    alert("Errore durante l'aggiornamento dello stato.");
+                });
+        };
+        
+        /*** PRODUCTS FUNCTIONS ***/
+        
+        window.loadProducts = function() {
+            const loader = document.getElementById('products-loader');
+            if(loader) loader.style.display = 'block';
+            const productsListEl = document.getElementById('productsList');
+            
+            const productsRef = ref(database, 'products');
+            onValue(productsRef, (snapshot) => {
+                const data = snapshot.val();
+                window.products = data ? Object.entries(data).map(([key, value]) => ({ ...value, firebaseKey: key })) : [];
+                
+                if (window.products.length === 0) {
+                    if(productsListEl) productsListEl.innerHTML = `<p>Nessun prodotto trovato. Aggiungi il tuo primo prodotto!</p>`;
+                } else {
+                    let productsHTML = `
+                        <table>
+                            <thead><tr><th>ID</th><th>Nome</th><th>Descrizione</th><th>Prezzo</th><th>Azioni</th></tr></thead>
+                            <tbody>`;
+                    window.products.forEach(product => {
+                        productsHTML += `
+                            <tr>
+                                <td>${product.id}</td>
+                                <td>${product.name}</td>
+                                <td>${product.description ? product.description.substring(0,50)+'...' : 'N/D'}</td>
+                                <td>€${(product.price || 0).toFixed(2)}</td>
+                                <td style="white-space: nowrap;">
+                                    <button onclick="editProduct('${product.firebaseKey}')" style="background-color: #1976D2; margin-right: 5px;">Modifica</button>
+                                    <button onclick="deleteProduct('${product.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
+                                </td>
+                            </tr>`;
+                    });
+                    productsHTML += `</tbody></table>`;
+                    if(productsListEl) productsListEl.innerHTML = productsHTML;
+                }
+                if(loader) loader.style.display = 'none';
+            }, (error) => {
+                 console.error("Errore caricamento prodotti:", error);
+                if(productsListEl) productsListEl.innerHTML = "<p class='error-message'>Errore nel caricamento dei prodotti.</p>";
+                if(loader) loader.style.display = 'none';
+            });
+        };
+        
+        window.showProductForm = function(isEdit = false, productKey = null) {
+            document.getElementById('product-form').style.display = 'block';
+            document.getElementById('product-form-title').textContent = isEdit ? 'Modifica Prodotto' : 'Aggiungi Nuovo Prodotto';
+            document.getElementById('product-id').value = productKey || '';
+            
+            if (isEdit && productKey) {
+                const product = window.products.find(p => p.firebaseKey === productKey);
+                if (product) {
+                    document.getElementById('product-name').value = product.name;
+                    document.getElementById('product-description').value = product.description;
+                    document.getElementById('product-price').value = product.price;
+                    document.getElementById('product-image').value = product.image;
+                }
+            } else {
+                document.getElementById('product-name').value = '';
+                document.getElementById('product-description').value = '';
+                document.getElementById('product-price').value = '';
+                document.getElementById('product-image').value = '';
+            }
+        };
+        
+        window.editProduct = function(productKey) {
+            showProductForm(true, productKey);
+        }
+
+        window.hideProductForm = function() {
+            document.getElementById('product-form').style.display = 'none';
+        };
+        
+        window.saveProduct = function() {
+            const productKey = document.getElementById('product-id').value;
+            const name = document.getElementById('product-name').value.trim();
+            const description = document.getElementById('product-description').value.trim();
+            const price = parseFloat(document.getElementById('product-price').value);
+            const image = document.getElementById('product-image').value.trim();
+            
+            if (!name) { alert('Il nome del prodotto è obbligatorio!'); return; }
+            if (isNaN(price) || price <= 0) { alert('Il prezzo deve essere un numero maggiore di zero!'); return; }
+            
+            const productData = {
+                name: name,
+                description: description,
+                price: price,
+                image: image || `https://via.placeholder.com/300x200.png?text=${name.replace(/ /g, '+')}`
+            };
+            
+            if (productKey) { // Modifica
+                const existingProduct = window.products.find(p => p.firebaseKey === productKey);
+                productData.id = existingProduct.id; // Mantieni lo stesso ID numerico
+                update(ref(database, `products/${productKey}`), productData)
+                    .then(() => { alert('Prodotto aggiornato!'); hideProductForm(); })
+                    .catch(err => { console.error(err); alert("Errore aggiornamento prodotto."); });
+            } else { // Aggiunta
+                productData.id = window.products.length > 0 ? Math.max(...window.products.map(p => parseInt(p.id) || 0)) + 1 : 1;
+                push(ref(database, 'products'), productData)
+                    .then(() => { alert('Prodotto aggiunto!'); hideProductForm(); })
+                    .catch(err => { console.error(err); alert("Errore aggiunta prodotto."); });
+            }
+        };
+        
+        window.deleteProduct = function(productKey) {
+            if (confirm('Sei sicuro di voler eliminare questo prodotto?')) {
+                remove(ref(database, `products/${productKey}`))
+                    .then(() => alert('Prodotto eliminato!'))
+                    .catch(err => { console.error(err); alert("Errore eliminazione prodotto."); });
+            }
+        };
+        
+        /*** LOCATIONS FUNCTIONS ***/
+        
+        window.loadLocations = function() {
+            const loader = document.getElementById('locations-loader');
+            if(loader) loader.style.display = 'block';
+            const locationsListEl = document.getElementById('locationsList');
+
+            const locationsRef = ref(database, 'locations');
+            onValue(locationsRef, (snapshot) => {
+                const data = snapshot.val();
+                window.locations = data ? Object.entries(data).map(([key, value]) => ({ ...value, firebaseKey: key })) : [];
+                window.locations.sort((a, b) => (parseInt(a.number) || 0) - (parseInt(b.number) || 0));
+                
+                if (window.locations.length === 0) {
+                   if(locationsListEl) locationsListEl.innerHTML = `<p>Nessuna postazione trovata. Aggiungi la tua prima postazione!</p>`;
+                } else {
+                    let locationsHTML = `
+                        <table>
+                            <thead><tr><th>Numero</th><th>Nome/Descrizione</th><th>Stato</th><th>Azioni</th></tr></thead>
+                            <tbody>`;
+                    window.locations.forEach(loc => {
+                        const statusText = loc.status === 'available' ? 'Disponibile' : loc.status === 'maintenance' ? 'In Manutenzione' : 'Riservata';
+                        const statusClass = loc.status === 'available' ? 'completed' : loc.status === 'maintenance' ? 'cancelled' : 'pending';
+                        locationsHTML += `
+                            <tr>
+                                <td>${loc.number}</td>
+                                <td>${loc.name}</td>
+                                <td><span class="order-status ${statusClass}">${statusText}</span></td>
+                                <td style="white-space: nowrap;">
+                                    <button onclick="editLocation('${loc.firebaseKey}')" style="background-color: #1976D2; margin-right: 5px;">Modifica</button>
+                                    <button onclick="deleteLocation('${loc.firebaseKey}')" style="background-color: #c62828;">Elimina</button>
+                                </td>
+                            </tr>`;
+                    });
+                    locationsHTML += `</tbody></table>`;
+                    if(locationsListEl) locationsListEl.innerHTML = locationsHTML;
+                }
+                if(loader) loader.style.display = 'none';
+            }, (error) => {
+                 console.error("Errore caricamento postazioni:", error);
+                if(locationsListEl) locationsListEl.innerHTML = "<p class='error-message'>Errore nel caricamento delle postazioni.</p>";
+                if(loader) loader.style.display = 'none';
+            });
+        };
+
+        window.showLocationForm = function(isEdit = false, locationKey = null) {
+            document.getElementById('location-form').style.display = 'block';
+            document.getElementById('location-form-title').textContent = isEdit ? 'Modifica Postazione' : 'Aggiungi Nuova Postazione';
+            document.getElementById('location-id').value = locationKey || '';
+
+            if (isEdit && locationKey) {
+                const loc = window.locations.find(l => l.firebaseKey === locationKey);
+                if (loc) {
+                    document.getElementById('location-number').value = loc.number;
+                    document.getElementById('location-name').value = loc.name;
+                    document.getElementById('location-status').value = loc.status || 'available';
+                }
+            } else {
+                 document.getElementById('location-number').value = '';
+                 document.getElementById('location-name').value = '';
+                 document.getElementById('location-status').value = 'available';
+            }
+        };
+        
+        window.editLocation = function(locationKey) {
+            showLocationForm(true, locationKey);
+        }
+
+        window.hideLocationForm = function() {
+            document.getElementById('location-form').style.display = 'none';
+        };
+        
+        window.saveLocation = function() {
+            const locationKey = document.getElementById('location-id').value;
+            const number = parseInt(document.getElementById('location-number').value);
+            const name = document.getElementById('location-name').value.trim();
+            const status = document.getElementById('location-status').value;
+            
+            if (isNaN(number) || number <= 0) { alert('Il numero della postazione è obbligatorio e deve essere positivo!'); return; }
+            if (!name) { alert('Il nome/descrizione della postazione è obbligatorio!'); return; }
+            
+            // Verifica unicità numero postazione (solo se non è modifica dello stesso elemento)
+            const existingLocationByNumber = window.locations.find(l => l.number === number && l.firebaseKey !== locationKey);
+            if (existingLocationByNumber) {
+                alert(`Esiste già una postazione con il numero ${number}. Scegli un altro numero!`);
+                return;
+            }
+
+            const locationData = { number: number, name: name, status: status };
+            
+            if (locationKey) { // Modifica
+                update(ref(database, `locations/${locationKey}`), locationData)
+                    .then(() => { alert('Postazione aggiornata!'); hideLocationForm(); })
+                    .catch(err => { console.error(err); alert("Errore aggiornamento postazione."); });
+            } else { // Aggiunta
+                push(ref(database, 'locations'), locationData)
+                    .then(() => { alert('Postazione aggiunta!'); hideLocationForm(); })
+                    .catch(err => { console.error(err); alert("Errore aggiunta postazione."); });
+            }
+        };
+        
+        window.deleteLocation = function(locationKey) {
+            if (confirm('Sei sicuro di voler eliminare questa postazione?')) {
+                remove(ref(database, `locations/${locationKey}`))
+                    .then(() => alert('Postazione eliminata!'))
+                    .catch(err => { console.error(err); alert("Errore eliminazione postazione."); });
+            }
+        };
+        
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                showPage('dashboard-page'); // Carica la dashboard se l'utente era già loggato
+            }
+
+            const passwordInput = document.getElementById('password');
+            if(passwordInput) {
+                passwordInput.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') {
+                        login();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
