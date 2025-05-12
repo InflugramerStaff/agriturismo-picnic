@@ -8,26 +8,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="admin.css"> </head>
+    <link rel="stylesheet" href="admin.css">
+</head>
 
 <body>
-    <div id="login-container" class="login-container">
-        <h2>Accesso Area Amministrativa</h2>
-        <div id="login-form">
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" placeholder="Inserisci la tua email">
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" placeholder="Inserisci la tua password">
-            </div>
-            <button id="login-button">Accedi</button>
-            <div id="login-error" class="error-message" style="display: none;"></div>
-        </div>
-    </div>
-
-    <div id="dashboard" style="display: none;">
+    <div id="dashboard" style="display: block;">
         <header>
             <h1>Area Amministrativa - Gestione Picnic</h1>
         </header>
@@ -41,8 +26,7 @@
                         <li><a data-page="orders-page">Ordini</a></li>
                         <li><a data-page="products-page">Prodotti</a></li>
                         <li><a data-page="locations-page">Postazioni</a></li>
-                        <li><a id="logout-button">Logout</a></li>
-                    </ul>
+                        </ul>
                 </div>
 
                 <div class="content">
@@ -166,6 +150,7 @@
 
     <div id="notification-container"></div>
 
-    <script src="admin.js" type="module"></script> </body>
+    <script src="admin.js" type="module"></script>
+</body>
 
 </html>
