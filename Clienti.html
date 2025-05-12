@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picnic Agricola Guss - Ordina Online</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Colori Agricola Guss */
+            --primary-color: #5A6F41; /* Verde oliva/salvia */
+            --primary-dark: #3F4F2D;  /* Verde oliva scuro */
+            --primary-light: #8A9F71; /* Verde oliva chiaro */
+            --secondary-color: #9B7E58; /* Marrone caldo/terra */
+            --secondary-dark: #7A5E38; /* Marrone scuro */
+            --secondary-light: #BBA485; /* Marrone chiaro */
+            --background-color: #F5F2E9; /* Beige/crema */
+            --background-light: #FAF7F0; /* Beige chiaro */
+            --accent-color: #A4BC7B; /* Verde chiaro/fresco */
+            --text-color: #38301E; /* Marrone scuro quasi nero */
+            --text-light: #6D6151; /* Marrone grigio */
+            --white: #FFFFFF;
+            
+            /* Stili generali */
+            --shadow: 0 4px 12px rgba(59, 50, 35, 0.08);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased; /* Migliora resa font */
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 1rem 0; /* Leggermente ridotto per mobile-first approach */
+            position: sticky; /* Header fisso in alto */
+            top: 0;
+            z-index: 1000; /* Assicura che sia sopra altri elementi */
+            box-shadow: var(--shadow);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem; /* Padding di base per mobile */
+        }
+        
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem; /* Adattato per mobile */
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 8px; /* Leggermente ridotto */
+            font-size: 1.5rem; /* Adattato */
+            color: var(--secondary-light);
+        }
+        
+        .cart-button {
+            background-color: var(--white);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 44px; /* Adattato */
+            height: 44px; /* Adattato */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .cart-button:hover {
+            transform: scale(1.05);
+            background-color: var(--background-light);
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -3px; /* Adattato */
+            right: -3px; /* Adattato */
+            background-color: var(--secondary-color);
+            color: white;
+            font-size: 0.75rem; /* Adattato */
+            width: 20px; /* Adattato */
+            height: 20px; /* Adattato */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem; /* Padding di base per mobile */
+        }
+        
+        .steps-container {
+            display: flex;
+            justify-content: space-around; /* Meglio per mobile */
+            margin-bottom: 2rem;
+            flex-wrap: nowrap; /* Evita a capo inizialmente */
+            overflow-x: auto; /* Permette scroll se non ci stanno */
+            padding-bottom: 10px; /* Spazio per lo scrollbar se appare */
+        }
+        
+        .step-indicator {
+            width: 36px; /* Adattato */
+            height: 36px; /* Adattato */
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column; /* Per testo sotto */
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem; /* Margine laterale ridotto */
+            position: relative;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            flex-shrink: 0; /* Impedisce che si restringano troppo */
+        }
+        
+        .step-indicator.active { background-color: var(--primary-color); color: white; }
+        .step-indicator.completed { background-color: var(--primary-dark); color: white; }
+        
+        .step-indicator::after { /* Rimuoviamo la linea per mobile, più pulito */
+            display: none;
+        }
+        
+        .step-text {
+            /* position: absolute; bottom: -25px; */ /* Modificato per essere dentro */
+            font-size: 0.7rem; /* Più piccolo per mobile */
+            font-weight: 500;
+            white-space: nowrap;
+            color: var(--text-light);
+            margin-top: 28px; /* Spazio dal cerchio */
+            text-align: center;
+        }
+        
+        .step-indicator.active .step-text { color: var(--primary-color); font-weight: 600; }
+        
+        .section-title {
+            margin-bottom: 1.5rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            color: var(--primary-dark);
+            position: relative;
+            display: inline-block;
+            font-size: 1.5rem; /* Adattato */
+        }
+        
+        .section-title::after {
+            content: ''; position: absolute; height: 3px; width: 50%;
+            background-color: var(--secondary-color); bottom: -5px; left: 0;
+        }
+        
+        .card {
+            background-color: var(--background-light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem; /* Adattato */
+            margin-bottom: 1.5rem; /* Adattato */
+            transition: var(--transition);
+            border: 1px solid rgba(155, 126, 88, 0.1);
+        }
+        
+        .card:hover { box-shadow: 0 6px 12px rgba(59, 50, 35, 0.12); }
+        
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .form-group { margin-bottom: 1.2rem; /* Adattato */ }
+        
+        label { display: block; margin-bottom: 0.4rem; font-weight: 500; color: var(--text-color); font-size: 0.9rem; /* Adattato */ }
+        
+        input, select, textarea {
+            width: 100%; padding: 0.75rem 1rem; /* Adattato */
+            border: 1px solid #e0e0e0; border-radius: var(--radius);
+            font-size: 0.9rem; /* Adattato */ font-family: 'Poppins', sans-serif;
+            transition: var(--transition); background-color: var(--white);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235A6F41' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 1rem center;
+            background-size: 1.2em; cursor: pointer;
+        }
+        
+        .button {
+            background-color: var(--primary-color); color: white; border: none;
+            border-radius: var(--radius); padding: 0.75rem 1.2rem; /* Adattato */
+            font-size: 0.9rem; /* Adattato */ font-weight: 500; cursor: pointer;
+            transition: var(--transition); display: inline-flex;
+            align-items: center; justify-content: center;
+            width: 100%; /* Full width per mobile nei container */
+        }
+        
+        .buttons-container .button, .cart-actions .button { /* Target specific buttons */
+            width: 100%;
+        }
+        .product-actions .add-to-cart-btn { /* Non full width per i prodotti */
+             width: auto;
+        }
+
+        .button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .button i { margin-right: 0.5rem; }
+        .button-secondary { background-color: var(--secondary-color); }
+        .button-secondary:hover { background-color: var(--secondary-dark); }
+        .button-danger { background-color: #e74c3c; }
+        .button-danger:hover { background-color: #c0392b; }
+        
+        .buttons-container {
+            display: flex;
+            flex-direction: column; /* Default a colonna per mobile */
+            gap: 0.8rem; /* Spazio tra bottoni */
+            margin-top: 1.5rem;
+        }
+        
+        /* Step 1 - Location Selection */
+        .location-select {
+            border: 2px solid var(--secondary-light); border-radius: var(--radius);
+            padding: 1rem; margin-bottom: 1rem; transition: var(--transition);
+            cursor: pointer; background-color: var(--white);
+        }
+        .location-select:hover { border-color:var(--primary-light); background-color:rgba(164,188,123,0.05); transform:translateY(-2px); }
+        .location-select.selected { border-color:var(--primary-color); background-color:rgba(164,188,123,0.15); }
+        .location-name { font-weight:600; margin-bottom:0.2rem; color:var(--primary-dark); font-size: 1rem; /* Adattato */ }
+        .location-description { color:var(--text-light); font-size:0.85rem; /* Adattato */ }
+        
+        /* Step 2 - Products */
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Singola colonna per mobile */
+            gap: 1.5rem; margin-top: 1.5rem;
+        }
+        .product-card {
+            background-color:var(--white); border-radius:var(--radius); box-shadow:var(--shadow);
+            overflow:hidden; transition:var(--transition); display:flex; flex-direction:column;
+            height:100%; border:1px solid rgba(155,126,88,0.1);
+        }
+        .product-card:hover { transform:translateY(-5px); box-shadow:0 8px 16px rgba(59,50,35,0.12); }
+        .product-image-container { height:180px; overflow:hidden; position:relative; }
+        .product-image { width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease; }
+        .product-card:hover .product-image { transform:scale(1.05); }
+        .product-price-tag {
+            position:absolute; top:0.8rem; right:0.8rem; /* Adattato */
+            background-color:var(--secondary-color); color:white; padding:0.4rem 0.8rem; /* Adattato */
+            border-radius:50px; font-weight:600; font-size:0.8rem; /* Adattato */ box-shadow:var(--shadow);
+        }
+        .product-content { padding:1rem; display:flex; flex-direction:column; flex-grow:1; } /* Adattato padding */
+        .product-title { font-weight:600; margin-bottom:0.5rem; color:var(--text-color); font-family:'Playfair Display',serif; font-size: 1.1rem; /* Adattato */}
+        .product-description { color:var(--text-light); font-size:0.85rem; margin-bottom:1rem; flex-grow:1; /* Adattato */}
+        .product-actions { display:flex; align-items:center; justify-content:space-between; margin-top:auto; }
+        .quantity-control { display:flex; align-items:center; border:1px solid #e0e0e0; border-radius:50px; overflow:hidden; }
+        .qty-btn { background-color:#f5f5f5; border:none; width:32px; height:32px; /* Adattato */ display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--transition); color:var(--text-color); }
+        .qty-btn:hover { background-color:#e0e0e0; }
+        .qty-input { width:36px; height:32px; /* Adattato */ border:none; text-align:center; font-size:0.85rem; font-weight:500; padding:0; }
+        .add-to-cart-btn {
+            background-color:var(--primary-color); color:white; border:none; border-radius:50px;
+            padding:0.4rem 0.8rem; /* Adattato */ font-size:0.85rem; /* Adattato */ font-weight:500;
+            cursor:pointer; transition:var(--transition); display:flex; align-items:center;
+        }
+        .add-to-cart-btn:hover { background-color:var(--primary-dark); }
+        .add-to-cart-btn i { margin-right:5px; }
+        
+        /* Cart Modal */
+        .cart-modal {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background-color:rgba(0,0,0,0.5); z-index:1001; /* Sopra header sticky */
+            justify-content:center; align-items:center; animation:fadeIn 0.3s ease;
+        }
+        .cart-container {
+            background-color:var(--background-light); border-radius:var(--radius);
+            box-shadow:0 10px 20px rgba(0,0,0,0.2); width:95%; /* Più largo su mobile */
+            max-width:500px; /* Leggermente ridotto */ max-height:90vh; /* Più alto su mobile */
+            overflow-y:auto; position:relative; animation:slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform:translateY(50px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+        .cart-header {
+            padding:1rem; /* Adattato */ border-bottom:1px solid rgba(155,126,88,0.2);
+            display:flex; justify-content:space-between; align-items:center;
+            position:sticky; top:0; background-color:var(--background-light); z-index:10;
+        }
+        .cart-title { font-weight:600; font-size:1.1rem; /* Adattato */ display:flex; align-items:center; font-family:'Playfair Display',serif; color:var(--primary-dark); }
+        .cart-title i { margin-right:8px; color:var(--secondary-color); /* Adattato */ }
+        .close-cart { background:none; border:none; font-size:1.3rem; /* Adattato */ cursor:pointer; color:var(--text-light); transition:var(--transition); }
+        .close-cart:hover { color:var(--text-color); }
+        .cart-items { padding:1rem; /* Adattato */ }
+        .cart-empty { text-align:center; padding:1.5rem; color:var(--text-light); /* Adattato */ }
+        .cart-empty i { font-size:2.5rem; color:var(--secondary-light); margin-bottom:1rem; display:block; /* Adattato */ }
+        .cart-item { display:flex; align-items:center; padding:0.8rem 0; border-bottom:1px solid rgba(155,126,88,0.1); /* Adattato */ flex-wrap: wrap; /* Permette a capo se necessario */ }
+        .cart-item-image { width:50px; height:50px; border-radius:var(--radius); overflow:hidden; margin-right:0.8rem; flex-shrink:0; /* Adattato */ }
+        .cart-item-image img { width:100%; height:100%; object-fit:cover; }
+        .cart-item-details { flex-grow:1; min-width: 120px; /* Evita restringimento eccessivo */ }
+        .cart-item-title { font-weight:500; margin-bottom:0.2rem; color:var(--text-color); font-size:0.9rem; /* Adattato */ }
+        .cart-item-price { color:var(--secondary-color); font-weight:600; font-size:0.8rem; /* Adattato */ }
+        .cart-item-quantity { display:flex; align-items:center; margin-left:auto; /* Sposta a destra */ margin-top: 0.5rem; /* Spazio se va a capo */ }
+        .cart-qty-btn { background-color:#f5f5f5; border:none; width:22px; height:22px; /* Adattato */ border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--transition); color:var(--text-color); font-size:0.7rem; /* Adattato */ }
+        .cart-qty-btn:hover { background-color:#e0e0e0; }
+        .cart-qty { margin:0 0.4rem; font-weight:500; min-width:18px; text-align:center; font-size:0.9rem; /* Adattato */ }
+        .cart-item-total { font-weight:600; margin-left:0.8rem; white-space:nowrap; color:var(--primary-color); font-size:0.9rem; /* Adattato */ }
+        .cart-item-remove { background:none; border:none; color:#e74c3c; cursor:pointer; margin-left:0.5rem; transition:var(--transition); font-size:0.9rem; /* Adattato */ }
+        .cart-item-remove:hover { color:#c0392b; }
+        .cart-footer { padding:1rem; border-top:1px solid rgba(155,126,88,0.2); position:sticky; bottom:0; background-color:var(--background-light); z-index:10; /* Adattato */ }
+        .cart-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+        .cart-total-label { font-weight:500; color:var(--text-color); font-size:1rem; /* Adattato */ }
+        .cart-total-value { font-weight:700; font-size:1.1rem; color:var(--primary-color); /* Adattato */ }
+        .cart-actions { display:flex; flex-direction:column; gap:0.8rem; /* Default a colonna per mobile */ }
+        
+        /* Step 3 - Checkout */
+        .order-summary { margin-top:1.5rem; border-top:1px solid rgba(155,126,88,0.2); padding-top:1.5rem; }
+        .summary-title { font-weight:600; margin-bottom:1rem; color:var(--primary-dark); display:flex; align-items:center; font-family:'Playfair Display',serif; font-size:1.2rem; /* Adattato */ }
+        .summary-title i { margin-right:0.5rem; color:var(--secondary-color); }
+        .summary-item { display:flex; justify-content:space-between; margin-bottom:0.5rem; padding:0.5rem 0; border-bottom:1px dashed rgba(155,126,88,0.2); font-size:0.9rem; /* Adattato */ }
+        .summary-item:last-child { border-bottom:none; }
+        .summary-item-label { color:var(--text-light); }
+        .summary-total { display:flex; justify-content:space-between; margin-top:1rem; padding-top:1rem; border-top:2px solid rgba(155,126,88,0.3); font-weight:600; font-size:1rem; /* Adattato */ }
+        .summary-total-value { color:var(--primary-color); }
+        .payment-notice { margin-top:1.5rem; padding:1rem; background-color:rgba(164,188,123,0.2); border-radius:var(--radius); color:var(--primary-dark); display:flex; align-items:center; border:1px solid rgba(164,188,123,0.3); font-size:0.9rem; /* Adattato */ }
+        .payment-notice i { margin-right:0.5rem; font-size:1.1rem; color:var(--primary-color); /* Adattato */ }
+        
+        /* Step 4 - Confirmation */
+        .confirmation-container { text-align:center; padding:1.5rem; /* Adattato */ }
+        .confirmation-icon { font-size:2.5rem; color:var(--primary-color); margin-bottom:1.5rem; background-color:rgba(164,188,123,0.2); width:80px; height:80px; /* Adattato */ border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; }
+        .confirmation-title { font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; color:var(--primary-dark); font-family:'Playfair Display',serif; /* Adattato */ }
+        .confirmation-message { font-size:1rem; color:var(--text-light); margin-bottom:1.5rem; max-width:600px; margin-left:auto; margin-right:auto; /* Adattato */ }
+        .order-details { background-color:rgba(164,188,123,0.1); border-radius:var(--radius); padding:1rem; margin-bottom:1.5rem; display:inline-block; text-align:left; border:1px solid rgba(164,188,123,0.3); /* Adattato */ }
+        .order-number { font-weight:700; color:var(--primary-color); font-size:1.1rem; margin-bottom:0.5rem; /* Adattato */ }
+        .order-details p { font-size:0.9rem; } /* Adattato */
+        
+        /* Loader */
+        .loader { display:none; width:36px; height:36px; /* Adattato */ border:3px solid var(--primary-light); border-top:3px solid var(--primary-color); border-radius:50%; animation:spin 1s linear infinite; margin:2rem auto; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+        
+        /* Notification */
+        .notification {
+            position:fixed; top:10px; left:10px; right:10px; /* Full width on small screens */
+            padding:1rem; background-color:var(--primary-color); color:white;
+            border-radius:var(--radius); box-shadow:var(--shadow); display:flex;
+            align-items:center; z-index:1002; /* Sopra modale carrello */
+            transform:translateY(-150%); transition:transform 0.3s ease;
+        }
+        .notification.show { transform:translateY(0); }
+        .notification i { margin-right:0.5rem; font-size:1.1rem; /* Adattato */ }
+        .notification-success { background-color:var(--primary-color); }
+        .notification-error { background-color:#e74c3c; }
+        
+        /* Stili specifici per schermi più grandi (desktop) */
+        @media (min-width: 577px) { /* Da tablet in su */
+            .header-content { padding: 0 2rem; }
+            .logo { font-size: 1.8rem; }
+            .logo i { font-size: 2rem; }
+            .cart-button { width: 50px; height: 50px; }
+            .cart-count { top: -5px; right: -5px; font-size: 0.8rem; width: 22px; height: 22px; }
+            .container { padding: 2rem; }
+            .steps-container { justify-content: center; } /* Centra gli step su schermi più grandi */
+            .step-indicator { width: 40px; height: 40px; margin: 0 1rem; }
+            .step-indicator::after { /* Ripristina la linea per desktop */
+                content: ''; position: absolute; height: 3px; width: calc(2rem + 100%); /* Calcola larghezza per coprire il margin */
+                background-color: #e0e0e0; top: 50%; left: 100%;
+                transform: translateY(-50%); z-index: -1;
+            }
+            .step-indicator:last-child::after { display: none; }
+            .step-indicator.completed::after { background-color: var(--primary-dark); }
+            .step-text { font-size: 0.8rem; margin-top: 30px; }
+            .section-title { font-size: 1.8rem; }
+            .card { padding: 2rem; margin-bottom: 2rem; }
+            .form-group { margin-bottom: 1.5rem; }
+            label { font-size: 1rem; }
+            input, select, textarea { padding: 0.8rem 1rem; font-size: 1rem; }
+            .button { padding: 0.8rem 1.5rem; font-size: 1rem; width: auto; /* Ripristina larghezza auto per desktop */}
+            .buttons-container { flex-direction: row; justify-content: space-between; }
+            .buttons-container .button { width: auto; /* Larghezza auto per bottoni nel container */ }
+            .cart-actions { flex-direction: row; justify-content: space-between; }
+            .cart-actions .button { width: auto; }
+            .location-name { font-size: 1rem; }
+            .location-description { font-size: 0.9rem; }
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Colonne per desktop */ }
+             .product-price-tag { top: 1rem; right: 1rem; padding: 0.5rem 1rem; font-size: 0.9rem; }
+            .product-content { padding: 1.5rem; }
+            .product-title { font-size: 1.2rem; }
+            .product-description { font-size: 0.9rem; }
+            .qty-btn { width: 36px; height: 36px; }
+            .qty-input { width: 40px; height: 36px; font-size: 0.9rem; }
+            .add-to-cart-btn { padding: 0.5rem 1rem; font-size: 0.9rem; }
+            .cart-container { width: 90%; max-width: 600px; } /* Dimensioni modale carrello per desktop */
+            .cart-header { padding: 1.5rem; }
+            .cart-title { font-size: 1.2rem; }
+            .cart-title i { margin-right: 10px; }
+            .close-cart { font-size: 1.5rem; }
+            .cart-items { padding: 1.5rem; }
+            .cart-empty i { font-size: 3rem; }
+            .cart-item { flex-wrap: nowrap; /* Non andare a capo su desktop */ }
+            .cart-item-image { width: 60px; height: 60px; margin-right: 1rem; }
+            .cart-item-title { font-size: 1rem; }
+            .cart-item-price { font-size: 0.9rem; }
+            .cart-item-quantity { margin-left: 1rem; margin-top: 0; }
+            .cart-qty-btn { width: 24px; height: 24px; font-size: 0.8rem; }
+            .cart-qty { margin: 0 0.5rem; font-size: 1rem; }
+            .cart-item-total { font-size: 1rem; margin-left: 1rem; }
+            .cart-item-remove { font-size: 1rem; margin-left: 1rem; }
+            .cart-footer { padding: 1.5rem; }
+            .cart-total-label { font-size: 1.1rem; }
+            .cart-total-value { font-size: 1.2rem; }
+            .summary-title { font-size: 1.3rem; }
+            .summary-item { font-size: 1rem; }
+            .summary-total { font-size: 1.1rem; }
+            .payment-notice { font-size: 1rem; }
+            .payment-notice i { font-size: 1.2rem; }
+            .confirmation-container { padding: 2rem; }
+            .confirmation-icon { font-size: 3rem; width: 100px; height: 100px; }
+            .confirmation-title { font-size: 1.8rem; }
+            .confirmation-message { font-size: 1.1rem; }
+            .order-details { padding: 1.5rem; }
+            .order-number { font-size: 1.2rem; }
+            .order-details p { font-size: 1rem; }
+            .loader { width: 40px; height: 40px; }
+            .notification { top: 20px; right: 20px; left: auto; /* Ripristina per desktop */ transform: translateX(150%); width: auto; /* Larghezza auto per desktop */ }
+        }
+        @media (min-width: 769px) { /* Schermi ancora più grandi, ad es. per griglia prodotti */
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-leaf"></i> Agricola Guss Picnic
+            </div>
+            <button class="cart-button" id="cartButton" onclick="toggleCart()">
+                <i class="fas fa-shopping-basket"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="steps-container">
+            <div class="step-indicator active" id="step1-indicator">1<span class="step-text">Postazione</span></div>
+            <div class="step-indicator" id="step2-indicator">2<span class="step-text">Prodotti</span></div>
+            <div class="step-indicator" id="step3-indicator">3<span class="step-text">Checkout</span></div>
+            <div class="step-indicator" id="step4-indicator"><i class="fas fa-check"></i><span class="step-text">Conferma</span></div>
+        </div>
+        
+        <div class="step active" id="step1">
+            <div class="card">
+                <h2 class="section-title">Scegli la tua postazione</h2>
+                <p>Seleziona la postazione picnic per il tuo pranzo all'aria aperta con vista sul Lago di Como.</p>
+                <div class="form-group">
+                    <label for="location">Seleziona una postazione:</label>
+                    <select id="location" onchange="selectLocationFromDropdown()"><option value="">-- Seleziona --</option></select>
+                </div>
+                <div id="locationsContainer"><div class="loader" id="locationsLoader" style="display: block;"></div></div>
+                <div class="buttons-container"><div></div><button class="button" onclick="goToStep(2)"><i class="fas fa-arrow-right"></i> Continua</button></div>
+            </div>
+        </div>
+        
+        <div class="step" id="step2">
+            <div class="card">
+                <h2 class="section-title">Scegli i prodotti</h2>
+                <p>Seleziona i prodotti genuini a km zero per il tuo picnic.</p>
+                <div id="productGrid" class="product-grid"><div class="loader" id="productsLoader" style="display: block;"></div></div>
+                <div class="buttons-container">
+                    <button class="button button-secondary" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Indietro</button>
+                    <button class="button" onclick="goToStep(3)"><i class="fas fa-arrow-right"></i> Continua</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step" id="step3">
+            <div class="card">
+                <h2 class="section-title">Completa l'ordine</h2>
+                <p>Inserisci i tuoi dati per completare l'ordine.</p>
+                <div class="form-group"><label for="name">Nome e Cognome</label><input type="text" id="name" placeholder="Il tuo nome e cognome"></div>
+                <div class="form-group"><label for="phone">Numero di Telefono</label><input type="tel" id="phone" placeholder="Il tuo numero di telefono"></div>
+                <div class="form-group"><label for="notes">Note speciali (opzionale)</label><textarea id="notes" rows="3" placeholder="Richieste o allergie"></textarea></div>
+                <div class="order-summary">
+                    <h3 class="summary-title"><i class="fas fa-clipboard-list"></i> Riepilogo ordine</h3>
+                    <div class="summary-item"><span class="summary-item-label">Postazione:</span><span id="summaryLocation"></span></div>
+                    <div id="summaryItems"></div>
+                    <div class="summary-total"><span>Totale</span><span class="summary-total-value" id="summaryTotal">€0.00</span></div>
+                </div>
+                <div class="payment-notice"><i class="fas fa-info-circle"></i><span>Il pagamento avverrà alla consegna.</span></div>
+                <div class="buttons-container">
+                    <button class="button button-secondary" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i> Indietro</button>
+                    <button class="button" onclick="submitOrder()"><i class="fas fa-check"></i> Conferma Ordine</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="step" id="step4">
+            <div class="card">
+                <div class="confirmation-container">
+                    <div class="confirmation-icon"><i class="fas fa-check"></i></div>
+                    <h2 class="confirmation-title">Ordine Confermato!</h2>
+                    <p class="confirmation-message">Il tuo ordine è stato ricevuto. Preparati a goderti un picnic con vista!</p>
+                    <div class="order-details">
+                        <div class="order-number" id="orderNumber"></div>
+                        <p id="orderDateTime"></p>
+                    </div>
+                    <button class="button" onclick="startOver()"><i class="fas fa-home"></i> Nuova Ordinazione</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-container">
+            <div class="cart-header">
+                <div class="cart-title"><i class="fas fa-shopping-basket"></i> Il tuo cestino</div>
+                <button class="close-cart" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <div class="cart-empty"><i class="fas fa-shopping-basket"></i><p>Il tuo cestino è vuoto.</p></div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total"><span class="cart-total-label">Totale</span><span class="cart-total-value" id="cartTotal">€0.00</span></div>
+                <div class="cart-actions">
+                    <button class="button button-danger" onclick="clearCart()"><i class="fas fa-trash"></i> Svuota</button>
+                    <button class="button" onclick="toggleCart()"><i class="fas fa-check"></i> Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"><i class="fas fa-check-circle"></i><span id="notificationMessage"></span></div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        
+        const firebaseConfig = { databaseURL: "https://picnic-4467e-default-rtdb.europe-west1.firebasedatabase.app/" };
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        window.cart = [];
+        window.currentStep = 1;
+        window.selectedLocation = null;
+        window.productsData = [];
+        window.locationsData = [];
+        
+        window.loadLocations = function() {
+            const lc = document.getElementById('locationsContainer'), ll = document.getElementById('locationsLoader'), ls = document.getElementById('location');
+            ll.style.display = 'block'; lc.innerHTML = ''; ls.innerHTML = '<option value="">-- Seleziona --</option>';
+            onValue(ref(database, 'locations'), snap => {
+                const d = snap.val(); window.locationsData = d ? Object.entries(d).map(([k,v])=>({...v,firebaseKey:k})) : [];
+                window.locationsData.sort((a,b)=>a.number-b.number); ll.style.display = 'none';
+                if(window.locationsData.length===0){lc.innerHTML=`<div style="text-align:center;padding:1rem;color:var(--text-light);"><i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:1rem;"></i><p>Nessuna postazione disponibile.</p></div>`; return;}
+                window.locationsData.forEach(l => {
+                    if(l.status==='available'||!l.status){
+                        const o=document.createElement('option');o.value=l.number;o.textContent=`Postazione ${l.number} - ${l.name}`;ls.appendChild(o);
+                        const ld=document.createElement('div');ld.className='location-select';ld.setAttribute('data-location-id',l.number);ld.onclick=()=>selectLocation(l.number);
+                        ld.innerHTML=`<div class="location-name">Postazione ${l.number}</div><div class="location-description">${l.name}</div>`;lc.appendChild(ld);
+                    }
+                });
+                if(window.selectedLocation){selectLocation(window.selectedLocation);ls.value=window.selectedLocation;}
+            });
+        };
+        window.selectLocation = lId => {
+            document.querySelectorAll('.location-select').forEach(l=>l.classList.remove('selected'));
+            const sL=document.querySelector(`.location-select[data-location-id="${lId}"]`);
+            if(sL){sL.classList.add('selected');window.selectedLocation=lId;document.getElementById('location').value=lId;}
+        };
+        window.selectLocationFromDropdown = () => {const lId=document.getElementById('location').value;if(lId)selectLocation(lId);};
+        
+        window.loadProducts = function() {
+            const pg=document.getElementById('productGrid'),pl=document.getElementById('productsLoader');
+            pl.style.display='block';pg.innerHTML='';
+            onValue(ref(database,'products'),snap=>{
+                const d=snap.val();window.productsData=d?Object.entries(d).map(([k,v])=>({...v,firebaseKey:k})):[];
+                pl.style.display='none';
+                if(window.productsData.length===0){pg.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:1rem;color:var(--text-light);"><i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:1rem;"></i><p>Nessun prodotto disponibile.</p></div>`;return;}
+                window.productsData.forEach(p=>{
+                    const pc=document.createElement('div');pc.className='product-card';
+                    const pi=window.cart.find(i=>i.id===p.id),cq=pi?pi.quantity:0;
+                    pc.innerHTML=`<div class="product-image-container"><img src="${p.image}" alt="${p.name}" class="product-image"><div class="product-price-tag">€${p.price.toFixed(2)}</div></div><div class="product-content"><h3 class="product-title">${p.name}</h3><p class="product-description">${p.description||''}</p><div class="product-actions"><div class="quantity-control"><button class="qty-btn" onclick="event.stopPropagation();decrementQuantity(${p.id})"><i class="fas fa-minus"></i></button><input type="text" class="qty-input" id="quantity-${p.id}" value="${cq}" readonly><button class="qty-btn" onclick="event.stopPropagation();incrementQuantity(${p.id})"><i class="fas fa-plus"></i></button></div><button class="add-to-cart-btn" onclick="event.stopPropagation();addToCart(${p.id})"><i class="fas fa-plus"></i> Aggiungi</button></div></div>`;
+                    pg.appendChild(pc);
+                });
+            });
+        };
+        window.incrementQuantity=pId=>{const qe=document.getElementById(`quantity-${pId}`);qe.value=parseInt(qe.value)+1;};
+        window.decrementQuantity=pId=>{const qe=document.getElementById(`quantity-${pId}`);let q=parseInt(qe.value);if(q>0)qe.value=q-1;};
+        window.addToCart=pId=>{const p=window.productsData.find(x=>x.id===pId);if(!p)return;const qe=document.getElementById(`quantity-${pId}`),q=parseInt(qe.value);if(q<=0){showNotification('Seleziona una quantità','error');return;}const ei=window.cart.findIndex(i=>i.id===pId);if(ei!==-1)window.cart[ei].quantity=q;else window.cart.push({id:p.id,name:p.name,price:p.price,quantity:q,image:p.image});updateCartCount();showNotification(`${p.name} aggiunto!`,'success');};
+        window.updateCartCount=()=>{document.getElementById('cartCount').textContent=window.cart.reduce((t,i)=>t+i.quantity,0);};
+        window.toggleCart=()=>{const cm=document.getElementById('cartModal');if(cm.style.display==='flex'){cm.style.display='none';}else{updateCartDisplay();cm.style.display='flex';}};
+        window.updateCartDisplay=()=>{const ci=document.getElementById('cartItems'),ct=document.getElementById('cartTotal');if(window.cart.length===0){ci.innerHTML=`<div class="cart-empty"><i class="fas fa-shopping-basket"></i><p>Il tuo cestino è vuoto</p></div>`;ct.textContent='€0.00';return;}let t=0,ch='';window.cart.forEach(i=>{const it=i.price*i.quantity;t+=it;ch+=`<div class="cart-item"><div class="cart-item-image"><img src="${i.image}" alt="${i.name}"></div><div class="cart-item-details"><div class="cart-item-title">${i.name}</div><div class="cart-item-price">€${i.price.toFixed(2)}</div></div><div class="cart-item-quantity"><button class="cart-qty-btn" onclick="decrementCartItem(${i.id})"><i class="fas fa-minus"></i></button><span class="cart-qty">${i.quantity}</span><button class="cart-qty-btn" onclick="incrementCartItem(${i.id})"><i class="fas fa-plus"></i></button></div><div class="cart-item-total">€${it.toFixed(2)}</div><button class="cart-item-remove" onclick="removeCartItem(${i.id})"><i class="fas fa-trash"></i></button></div>`;});ci.innerHTML=ch;ct.textContent=`€${t.toFixed(2)}`;};
+        window.incrementCartItem=pId=>{const i=window.cart.find(x=>x.id===pId);if(i){i.quantity+=1;updateCartDisplay();updateCartCount();updateProductQuantity(pId,i.quantity);}};
+        window.decrementCartItem=pId=>{const i=window.cart.find(x=>x.id===pId);if(i&&i.quantity>1){i.quantity-=1;updateCartDisplay();updateCartCount();updateProductQuantity(pId,i.quantity);}else if(i&&i.quantity===1)removeCartItem(pId);};
+        window.removeCartItem=pId=>{window.cart=window.cart.filter(i=>i.id!==pId);updateCartDisplay();updateCartCount();updateProductQuantity(pId,0);};
+        window.updateProductQuantity=(pId,q)=>{const qi=document.getElementById(`quantity-${pId}`);if(qi)qi.value=q;};
+        window.clearCart=()=>{if(window.cart.length===0)return;if(confirm('Svuotare il cestino?')){window.cart.forEach(i=>updateProductQuantity(i.id,0));window.cart=[];updateCartDisplay();updateCartCount();showNotification('Cestino svuotato','success');}};
+        window.showNotification=(m,t='success')=>{const n=document.getElementById('notification'),nm=document.getElementById('notificationMessage');n.className='notification notification-'+t;nm.textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3000);};
+        window.goToStep=s=>{if(s===2&&!window.selectedLocation){showNotification('Seleziona una postazione','error');return;}if(s===3&&window.cart.length===0){showNotification('Il cestino è vuoto','error');return;}if(s===3)updateOrderSummary();document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));document.getElementById(`step${s}`).classList.add('active');document.querySelectorAll('.step-indicator').forEach(x=>x.classList.remove('active','completed'));for(let i=1;i<=4;i++){const ind=document.getElementById(`step${i}-indicator`);if(i===s)ind.classList.add('active');else if(i<s)ind.classList.add('completed');}window.currentStep=s;if(s===1&&window.locationsData.length===0)loadLocations();else if(s===2&&window.productsData.length===0)loadProducts();window.scrollTo({top:0,behavior:'smooth'});};
+        window.updateOrderSummary=()=>{const l=window.locationsData.find(x=>x.number==window.selectedLocation);if(l)document.getElementById('summaryLocation').textContent=`Postazione ${l.number} - ${l.name}`;const si=document.getElementById('summaryItems');si.innerHTML='';let t=0;window.cart.forEach(i=>{const it=i.price*i.quantity;t+=it;const s=document.createElement('div');s.className='summary-item';s.innerHTML=`<span>${i.name} x ${i.quantity}</span><span>€${it.toFixed(2)}</span>`;si.appendChild(s);});document.getElementById('summaryTotal').textContent=`€${t.toFixed(2)}`;};
+        window.submitOrder=()=>{const ni=document.getElementById('name'),pi=document.getElementById('phone'),noi=document.getElementById('notes');if(!ni.value.trim()){showNotification('Inserisci nome','error');ni.focus();return;}if(!pi.value.trim()){showNotification('Inserisci telefono','error');pi.focus();return;}const oId=generateOrderId(),l=window.locationsData.find(x=>x.number==window.selectedLocation),o={id:oId,date:new Date().toISOString(),customer:{name:ni.value.trim(),phone:pi.value.trim()},location:{number:window.selectedLocation,name:l?`Postazione ${l.number} - ${l.name}`:`Postazione ${window.selectedLocation}`},items:window.cart,notes:noi.value.trim(),status:'pending',total:window.cart.reduce((sm,i)=>sm+(i.price*i.quantity),0)};set(push(ref(database,'orders')),o).then(()=>{document.getElementById('orderNumber').textContent=`Num. ordine: ${oId}`;document.getElementById('orderDateTime').textContent=`Data: ${new Date().toLocaleString('it-IT')}`;goToStep(4);window.cart=[];updateCartCount();}).catch(e=>showNotification(`Errore: ${e.message}`,'error'));};
+        function generateOrderId(){const d=new Date(),y=d.getFullYear().toString().substr(-2),m=('0'+(d.getMonth()+1)).slice(-2),dt=('0'+d.getDate()).slice(-2),r=Math.floor(Math.random()*1000).toString().padStart(3,'0');return `ORD-${y}${m}${dt}-${r}`;}
+        window.startOver=()=>{document.getElementById('name').value='';document.getElementById('phone').value='';document.getElementById('notes').value='';window.selectedLocation=null;window.cart=[];updateCartCount();goToStep(1);};
+        document.addEventListener('DOMContentLoaded',()=>{loadLocations();document.addEventListener('keydown',e=>{if(e.key==='Escape'){const cm=document.getElementById('cartModal');if(cm.style.display==='flex')toggleCart();}});document.getElementById('cartModal').addEventListener('click',function(e){if(e.target===this)toggleCart();});});
+    </script>
+</body>
+</html>
