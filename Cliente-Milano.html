@@ -1,30 +1,30 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ritual Club</title>
+    <title>RITUAL Milano - Prenota Aperitivo</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Ho mantenuto lo stesso CSS come richiesto - non modificato */
         :root {
-            /* Nuovi colori per Picnic Milano */
-            --primary-color: #1E88E5; /* Blu Milano */
-            --primary-dark: #1565C0;  /* Blu scuro */
-            --primary-light: #64B5F6; /* Blu chiaro */
-            --secondary-color: #F4511E; /* Arancione */
-            --secondary-dark: #E64A19; /* Arancione scuro */
-            --secondary-light: #FF8A65; /* Arancione chiaro */
-            --background-color: #F5F5F5; /* Grigio chiaro */
-            --background-light: #FFFFFF; /* Bianco */
-            --accent-color: #4CAF50; /* Verde */
-            --text-color: #212121; /* Nero/grigio scuro */
-            --text-light: #757575; /* Grigio medio */
+            /* Colori Agricola Guss */
+            --primary-color: #5A6F41; /* Verde oliva/salvia */
+            --primary-dark: #3F4F2D;  /* Verde oliva scuro */
+            --primary-light: #8A9F71; /* Verde oliva chiaro */
+            --secondary-color: #9B7E58; /* Marrone caldo/terra */
+            --secondary-dark: #7A5E38; /* Marrone scuro */
+            --secondary-light: #BBA485; /* Marrone chiaro */
+            --background-color: #F5F2E9; /* Beige/crema */
+            --background-light: #FAF7F0; /* Beige chiaro */
+            --accent-color: #A4BC7B; /* Verde chiaro/fresco */
+            --text-color: #38301E; /* Marrone scuro quasi nero */
+            --text-light: #6D6151; /* Marrone grigio */
             --white: #FFFFFF;
             
             /* Stili generali */
-            --shadow: 0 4px 12px rgba(33, 33, 33, 0.08);
+            --shadow: 0 4px 12px rgba(59, 50, 35, 0.08);
             --radius: 12px;
             --transition: all 0.3s ease;
         }
@@ -224,7 +224,7 @@
         
         select {
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231E88E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235A6F41' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat; background-position: right 1rem center;
             background-size: 1.2em; cursor: pointer;
         }
@@ -265,8 +265,8 @@
             padding: 1rem; margin-bottom: 1rem; transition: var(--transition);
             cursor: pointer; background-color: var(--white);
         }
-        .location-select:hover { border-color:var(--primary-light); background-color:rgba(100,181,246,0.05); transform:translateY(-2px); }
-        .location-select.selected { border-color:var(--primary-color); background-color:rgba(100,181,246,0.15); }
+        .location-select:hover { border-color:var(--primary-light); background-color:rgba(164,188,123,0.05); transform:translateY(-2px); }
+        .location-select.selected { border-color:var(--primary-color); background-color:rgba(164,188,123,0.15); }
         .location-name { font-weight:600; margin-bottom:0.2rem; color:var(--primary-dark); font-size: 1rem; }
         .location-description { color:var(--text-light); font-size:0.85rem; }
         
@@ -281,7 +281,7 @@
             overflow:hidden; transition:var(--transition); display:flex; flex-direction:column;
             height:100%; border:1px solid rgba(155,126,88,0.1);
         }
-        .product-card:hover { transform:translateY(-5px); box-shadow:0 8px 16px rgba(33,33,33,0.12); }
+        .product-card:hover { transform:translateY(-5px); box-shadow:0 8px 16px rgba(59,50,35,0.12); }
         .product-image-container { height:180px; overflow:hidden; position:relative; }
         .product-image { width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease; }
         .product-card:hover .product-image { transform:scale(1.05); }
@@ -359,15 +359,15 @@
         .summary-item-label { color:var(--text-light); }
         .summary-total { display:flex; justify-content:space-between; margin-top:1rem; padding-top:1rem; border-top:2px solid rgba(155,126,88,0.3); font-weight:600; font-size:1rem; }
         .summary-total-value { color:var(--primary-color); }
-        .payment-notice { margin-top:1.5rem; padding:1rem; background-color:rgba(100,181,246,0.2); border-radius:var(--radius); color:var(--primary-dark); display:flex; align-items:center; border:1px solid rgba(100,181,246,0.3); font-size:0.9rem; }
+        .payment-notice { margin-top:1.5rem; padding:1rem; background-color:rgba(164,188,123,0.2); border-radius:var(--radius); color:var(--primary-dark); display:flex; align-items:center; border:1px solid rgba(164,188,123,0.3); font-size:0.9rem; }
         .payment-notice i { margin-right:0.5rem; font-size:1.1rem; color:var(--primary-color); }
         
         /* Step 4 - Confirmation */
         .confirmation-container { text-align:center; padding:1.5rem; }
-        .confirmation-icon { font-size:2.5rem; color:var(--primary-color); margin-bottom:1.5rem; background-color:rgba(100,181,246,0.2); width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; }
+        .confirmation-icon { font-size:2.5rem; color:var(--primary-color); margin-bottom:1.5rem; background-color:rgba(164,188,123,0.2); width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; }
         .confirmation-title { font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; color:var(--primary-dark); font-family:'Playfair Display',serif; }
         .confirmation-message { font-size:1rem; color:var(--text-light); margin-bottom:1.5rem; max-width:600px; margin-left:auto; margin-right:auto; }
-        .order-details { background-color:rgba(100,181,246,0.1); border-radius:var(--radius); padding:1rem; margin-bottom:1.5rem; display:inline-block; text-align:left; border:1px solid rgba(100,181,246,0.3); }
+        .order-details { background-color:rgba(164,188,123,0.1); border-radius:var(--radius); padding:1rem; margin-bottom:1.5rem; display:inline-block; text-align:left; border:1px solid rgba(164,188,123,0.3); }
         .order-number { font-weight:700; color:var(--primary-color); font-size:1.1rem; margin-bottom:0.5rem; }
         .order-details p { font-size:0.9rem; }
         
@@ -449,10 +449,10 @@
     <header>
         <div class="header-content">
             <div class="logo">
-                <i class="fas fa-leaf"></i> Ritual
+                <i class="fas fa-glass-martini-alt"></i> RITUAL Milano
             </div>
             <button class="cart-button" id="cartButton" onclick="toggleCart()">
-                <i class="fas fa-shopping-basket"></i>
+                <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count" id="cartCount">0</span>
             </button>
         </div>
@@ -460,18 +460,18 @@
     
     <div class="container">
         <div class="steps-container">
-            <div class="step-indicator active" id="step1-indicator">1<span class="step-text">Postazione</span></div>
-            <div class="step-indicator" id="step2-indicator">2<span class="step-text">Prodotti</span></div>
+            <div class="step-indicator active" id="step1-indicator">1<span class="step-text">Tavolo</span></div>
+            <div class="step-indicator" id="step2-indicator">2<span class="step-text">Drink</span></div>
             <div class="step-indicator" id="step3-indicator">3<span class="step-text">Checkout</span></div>
             <div class="step-indicator" id="step4-indicator"><i class="fas fa-check"></i><span class="step-text">Conferma</span></div>
         </div>
         
         <div class="step active" id="step1">
             <div class="card">
-                <h2 class="section-title">Scegli la tua postazione</h2>
-                <p>Seleziona la postazione picnic per il tuo pranzo all'aria aperta.</p>
+                <h2 class="section-title">Scegli il tuo tavolo</h2>
+                <p>Seleziona un tavolo per il tuo aperitivo nel cuore di Milano.</p>
                 <div class="form-group">
-                    <label for="location">Seleziona una postazione:</label>
+                    <label for="location">Seleziona un tavolo:</label>
                     <select id="location" onchange="selectLocationFromDropdown()"><option value="">-- Seleziona --</option></select>
                 </div>
                 <div id="locationsContainer"><div class="loader" id="locationsLoader" style="display: block;"></div></div>
@@ -481,8 +481,8 @@
         
         <div class="step" id="step2">
             <div class="card">
-                <h2 class="section-title">Scegli i prodotti</h2>
-                <p>Seleziona i prodotti genuini a km zero per il tuo picnic.</p>
+                <h2 class="section-title">Scegli i tuoi drink</h2>
+                <p>Seleziona i cocktail e gli stuzzichini per il tuo aperitivo.</p>
                 <div id="productGrid" class="product-grid"><div class="loader" id="productsLoader" style="display: block;"></div></div>
                 <div class="buttons-container">
                     <button class="button button-secondary" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Indietro</button>
@@ -493,21 +493,24 @@
         
         <div class="step" id="step3">
             <div class="card">
-                <h2 class="section-title">Completa l'ordine</h2>
-                <p>Inserisci i tuoi dati per completare l'ordine.</p>
+                <h2 class="section-title">Completa la prenotazione</h2>
+                <p>Inserisci i tuoi dati per confermare la prenotazione.</p>
                 <div class="form-group"><label for="name">Nome e Cognome</label><input type="text" id="name" placeholder="Il tuo nome e cognome"></div>
                 <div class="form-group"><label for="phone">Numero di Telefono</label><input type="tel" id="phone" placeholder="Il tuo numero di telefono"></div>
-                <div class="form-group"><label for="notes">Note speciali (opzionale)</label><textarea id="notes" rows="3" placeholder="Richieste o allergie"></textarea></div>
+                <div class="form-group"><label for="date">Data</label><input type="date" id="date"></div>
+                <div class="form-group"><label for="time">Ora</label><input type="time" id="time" min="18:00" max="23:30"></div>
+                <div class="form-group"><label for="people">Numero di persone</label><input type="number" id="people" min="1" max="10" value="2"></div>
+                <div class="form-group"><label for="notes">Note speciali (opzionale)</label><textarea id="notes" rows="3" placeholder="Richieste o preferenze particolari"></textarea></div>
                 <div class="order-summary">
-                    <h3 class="summary-title"><i class="fas fa-clipboard-list"></i> Riepilogo ordine</h3>
-                    <div class="summary-item"><span class="summary-item-label">Postazione:</span><span id="summaryLocation"></span></div>
+                    <h3 class="summary-title"><i class="fas fa-clipboard-list"></i> Riepilogo prenotazione</h3>
+                    <div class="summary-item"><span class="summary-item-label">Tavolo:</span><span id="summaryLocation"></span></div>
                     <div id="summaryItems"></div>
                     <div class="summary-total"><span>Totale</span><span class="summary-total-value" id="summaryTotal">€0.00</span></div>
                 </div>
-                <div class="payment-notice"><i class="fas fa-info-circle"></i><span>Il pagamento avverrà alla consegna.</span></div>
+                <div class="payment-notice"><i class="fas fa-info-circle"></i><span>Prepagamento necessario per confermare la prenotazione. Saldo al tavolo.</span></div>
                 <div class="buttons-container">
                     <button class="button button-secondary" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i> Indietro</button>
-                    <button class="button" onclick="submitOrder()"><i class="fas fa-check"></i> Conferma Ordine</button>
+                    <button class="button" onclick="submitOrder()"><i class="fas fa-check"></i> Conferma Prenotazione</button>
                 </div>
             </div>
         </div>
@@ -516,13 +519,13 @@
             <div class="card">
                 <div class="confirmation-container">
                     <div class="confirmation-icon"><i class="fas fa-check"></i></div>
-                    <h2 class="confirmation-title">Ordine Confermato!</h2>
-                    <p class="confirmation-message">Il tuo ordine è stato ricevuto. Preparati a goderti un picnic con vista!</p>
+                    <h2 class="confirmation-title">Prenotazione Confermata!</h2>
+                    <p class="confirmation-message">La tua prenotazione è stata ricevuta. Non vediamo l'ora di accoglierti da RITUAL per il tuo aperitivo!</p>
                     <div class="order-details">
                         <div class="order-number" id="orderNumber"></div>
                         <p id="orderDateTime"></p>
                     </div>
-                    <button class="button" onclick="startOver()"><i class="fas fa-home"></i> Nuova Ordinazione</button>
+                    <button class="button" onclick="startOver()"><i class="fas fa-home"></i> Nuova Prenotazione</button>
                 </div>
             </div>
         </div>
@@ -531,11 +534,11 @@
     <div class="cart-modal" id="cartModal">
         <div class="cart-container">
             <div class="cart-header">
-                <div class="cart-title"><i class="fas fa-shopping-basket"></i> Il tuo cestino</div>
+                <div class="cart-title"><i class="fas fa-shopping-cart"></i> Il tuo ordine</div>
                 <button class="close-cart" onclick="toggleCart()"><i class="fas fa-times"></i></button>
             </div>
             <div class="cart-items" id="cartItems">
-                <div class="cart-empty"><i class="fas fa-shopping-basket"></i><p>Il tuo cestino è vuoto.</p></div>
+                <div class="cart-empty"><i class="fas fa-glass-martini-alt"></i><p>Il tuo ordine è vuoto.</p></div>
             </div>
             <div class="cart-footer">
                 <div class="cart-total"><span class="cart-total-label">Totale</span><span class="cart-total-value" id="cartTotal">€0.00</span></div>
@@ -553,7 +556,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, push, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         
-        const firebaseConfig = { databaseURL: "https://picnic-4467e-default-rtdb.europe-west1.firebasedatabase.app/" };
+        const firebaseConfig = { databaseURL: "https://ritual-milano-default-rtdb.europe-west1.firebasedatabase.app/" };
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         
@@ -569,12 +572,12 @@
             onValue(ref(database, 'locations'), snap => {
                 const d = snap.val(); window.locationsData = d ? Object.entries(d).map(([k,v])=>({...v,firebaseKey:k})) : [];
                 window.locationsData.sort((a,b)=>a.number-b.number); ll.style.display = 'none';
-                if(window.locationsData.length===0){lc.innerHTML=`<div style="text-align:center;padding:1rem;color:var(--text-light);"><i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:1rem;"></i><p>Nessuna postazione disponibile.</p></div>`; return;}
+                if(window.locationsData.length===0){lc.innerHTML=`<div style="text-align:center;padding:1rem;color:var(--text-light);"><i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:1rem;"></i><p>Nessun tavolo disponibile.</p></div>`; return;}
                 window.locationsData.forEach(l => {
                     if(l.status==='available'||!l.status){
-                        const o=document.createElement('option');o.value=l.number;o.textContent=`Postazione ${l.number} - ${l.name}`;ls.appendChild(o);
+                        const o=document.createElement('option');o.value=l.number;o.textContent=`Tavolo ${l.number} - ${l.name}`;ls.appendChild(o);
                         const ld=document.createElement('div');ld.className='location-select';ld.setAttribute('data-location-id',l.number);ld.onclick=()=>selectLocation(l.number);
-                        ld.innerHTML=`<div class="location-name">Postazione ${l.number}</div><div class="location-description">${l.name}</div>`;lc.appendChild(ld);
+                        ld.innerHTML=`<div class="location-name">Tavolo ${l.number}</div><div class="location-description">${l.name}</div>`;lc.appendChild(ld);
                     }
                 });
                 if(window.selectedLocation){selectLocation(window.selectedLocation);ls.value=window.selectedLocation;}
@@ -607,19 +610,99 @@
         window.addToCart=pId=>{const p=window.productsData.find(x=>x.id===pId);if(!p)return;const qe=document.getElementById(`quantity-${pId}`),q=parseInt(qe.value);if(q<=0){showNotification('Seleziona una quantità','error');return;}const ei=window.cart.findIndex(i=>i.id===pId);if(ei!==-1)window.cart[ei].quantity=q;else window.cart.push({id:p.id,name:p.name,price:p.price,quantity:q,image:p.image});updateCartCount();showNotification(`${p.name} aggiunto!`,'success');};
         window.updateCartCount=()=>{document.getElementById('cartCount').textContent=window.cart.reduce((t,i)=>t+i.quantity,0);};
         window.toggleCart=()=>{const cm=document.getElementById('cartModal');if(cm.style.display==='flex'){cm.style.display='none';}else{updateCartDisplay();cm.style.display='flex';}};
-        window.updateCartDisplay=()=>{const ci=document.getElementById('cartItems'),ct=document.getElementById('cartTotal');if(window.cart.length===0){ci.innerHTML=`<div class="cart-empty"><i class="fas fa-shopping-basket"></i><p>Il tuo cestino è vuoto</p></div>`;ct.textContent='€0.00';return;}let t=0,ch='';window.cart.forEach(i=>{const it=i.price*i.quantity;t+=it;ch+=`<div class="cart-item"><div class="cart-item-image"><img src="${i.image}" alt="${i.name}"></div><div class="cart-item-details"><div class="cart-item-title">${i.name}</div><div class="cart-item-price">€${i.price.toFixed(2)}</div></div><div class="cart-item-quantity"><button class="cart-qty-btn" onclick="decrementCartItem(${i.id})"><i class="fas fa-minus"></i></button><span class="cart-qty">${i.quantity}</span><button class="cart-qty-btn" onclick="incrementCartItem(${i.id})"><i class="fas fa-plus"></i></button></div><div class="cart-item-total">€${it.toFixed(2)}</div><button class="cart-item-remove" onclick="removeCartItem(${i.id})"><i class="fas fa-trash"></i></button></div>`;});ci.innerHTML=ch;ct.textContent=`€${t.toFixed(2)}`;};
+        window.updateCartDisplay=()=>{const ci=document.getElementById('cartItems'),ct=document.getElementById('cartTotal');if(window.cart.length===0){ci.innerHTML=`<div class="cart-empty"><i class="fas fa-glass-martini-alt"></i><p>Il tuo ordine è vuoto</p></div>`;ct.textContent='€0.00';return;}let t=0,ch='';window.cart.forEach(i=>{const it=i.price*i.quantity;t+=it;ch+=`<div class="cart-item"><div class="cart-item-image"><img src="${i.image}" alt="${i.name}"></div><div class="cart-item-details"><div class="cart-item-title">${i.name}</div><div class="cart-item-price">€${i.price.toFixed(2)}</div></div><div class="cart-item-quantity"><button class="cart-qty-btn" onclick="decrementCartItem(${i.id})"><i class="fas fa-minus"></i></button><span class="cart-qty">${i.quantity}</span><button class="cart-qty-btn" onclick="incrementCartItem(${i.id})"><i class="fas fa-plus"></i></button></div><div class="cart-item-total">€${it.toFixed(2)}</div><button class="cart-item-remove" onclick="removeCartItem(${i.id})"><i class="fas fa-trash"></i></button></div>`;});ci.innerHTML=ch;ct.textContent=`€${t.toFixed(2)}`;};
         window.incrementCartItem=pId=>{const i=window.cart.find(x=>x.id===pId);if(i){i.quantity+=1;updateCartDisplay();updateCartCount();updateProductQuantity(pId,i.quantity);}};
         window.decrementCartItem=pId=>{const i=window.cart.find(x=>x.id===pId);if(i&&i.quantity>1){i.quantity-=1;updateCartDisplay();updateCartCount();updateProductQuantity(pId,i.quantity);}else if(i&&i.quantity===1)removeCartItem(pId);};
         window.removeCartItem=pId=>{window.cart=window.cart.filter(i=>i.id!==pId);updateCartDisplay();updateCartCount();updateProductQuantity(pId,0);};
         window.updateProductQuantity=(pId,q)=>{const qi=document.getElementById(`quantity-${pId}`);if(qi)qi.value=q;};
-        window.clearCart=()=>{if(window.cart.length===0)return;if(confirm('Svuotare il cestino?')){window.cart.forEach(i=>updateProductQuantity(i.id,0));window.cart=[];updateCartDisplay();updateCartCount();showNotification('Cestino svuotato','success');}};
+        window.clearCart=()=>{if(window.cart.length===0)return;if(confirm('Svuotare l\'ordine?')){window.cart.forEach(i=>updateProductQuantity(i.id,0));window.cart=[];updateCartDisplay();updateCartCount();showNotification('Ordine svuotato','success');}};
         window.showNotification=(m,t='success')=>{const n=document.getElementById('notification'),nm=document.getElementById('notificationMessage');n.className='notification notification-'+t;nm.textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3000);};
-        window.goToStep=s=>{if(s===2&&!window.selectedLocation){showNotification('Seleziona una postazione','error');return;}if(s===3&&window.cart.length===0){showNotification('Il cestino è vuoto','error');return;}if(s===3)updateOrderSummary();document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));document.getElementById(`step${s}`).classList.add('active');document.querySelectorAll('.step-indicator').forEach(x=>x.classList.remove('active','completed'));for(let i=1;i<=4;i++){const ind=document.getElementById(`step${i}-indicator`);if(i===s)ind.classList.add('active');else if(i<s)ind.classList.add('completed');}window.currentStep=s;if(s===1&&window.locationsData.length===0)loadLocations();else if(s===2&&window.productsData.length===0)loadProducts();window.scrollTo({top:0,behavior:'smooth'});};
-        window.updateOrderSummary=()=>{const l=window.locationsData.find(x=>x.number==window.selectedLocation);if(l)document.getElementById('summaryLocation').textContent=`Postazione ${l.number} - ${l.name}`;const si=document.getElementById('summaryItems');si.innerHTML='';let t=0;window.cart.forEach(i=>{const it=i.price*i.quantity;t+=it;const s=document.createElement('div');s.className='summary-item';s.innerHTML=`<span>${i.name} x ${i.quantity}</span><span>€${it.toFixed(2)}</span>`;si.appendChild(s);});document.getElementById('summaryTotal').textContent=`€${t.toFixed(2)}`;};
-        window.submitOrder=()=>{const ni=document.getElementById('name'),pi=document.getElementById('phone'),noi=document.getElementById('notes');if(!ni.value.trim()){showNotification('Inserisci nome','error');ni.focus();return;}if(!pi.value.trim()){showNotification('Inserisci telefono','error');pi.focus();return;}const oId=generateOrderId(),l=window.locationsData.find(x=>x.number==window.selectedLocation),o={id:oId,date:new Date().toISOString(),customer:{name:ni.value.trim(),phone:pi.value.trim()},location:{number:window.selectedLocation,name:l?`Postazione ${l.number} - ${l.name}`:`Postazione ${window.selectedLocation}`},items:window.cart,notes:noi.value.trim(),status:'pending',total:window.cart.reduce((sm,i)=>sm+(i.price*i.quantity),0)};set(push(ref(database,'orders')),o).then(()=>{document.getElementById('orderNumber').textContent=`Num. ordine: ${oId}`;document.getElementById('orderDateTime').textContent=`Data: ${new Date().toLocaleString('it-IT')}`;goToStep(4);window.cart=[];updateCartCount();}).catch(e=>showNotification(`Errore: ${e.message}`,'error'));};
-        function generateOrderId(){const d=new Date(),y=d.getFullYear().toString().substr(-2),m=('0'+(d.getMonth()+1)).slice(-2),dt=('0'+d.getDate()).slice(-2),r=Math.floor(Math.random()*1000).toString().padStart(3,'0');return `ORD-${y}${m}${dt}-${r}`;}
-        window.startOver=()=>{document.getElementById('name').value='';document.getElementById('phone').value='';document.getElementById('notes').value='';window.selectedLocation=null;window.cart=[];updateCartCount();goToStep(1);};
-        document.addEventListener('DOMContentLoaded',()=>{loadLocations();document.addEventListener('keydown',e=>{if(e.key==='Escape'){const cm=document.getElementById('cartModal');if(cm.style.display==='flex')toggleCart();}});document.getElementById('cartModal').addEventListener('click',function(e){if(e.target===this)toggleCart();});});
+        window.goToStep=s=>{if(s===2&&!window.selectedLocation){showNotification('Seleziona un tavolo','error');return;}if(s===3&&window.cart.length===0){showNotification('L\'ordine è vuoto','error');return;}if(s===3)updateOrderSummary();document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));document.getElementById(`step${s}`).classList.add('active');document.querySelectorAll('.step-indicator').forEach(x=>x.classList.remove('active','completed'));for(let i=1;i<=4;i++){const ind=document.getElementById(`step${i}-indicator`);if(i===s)ind.classList.add('active');else if(i<s)ind.classList.add('completed');}window.currentStep=s;if(s===1&&window.locationsData.length===0)loadLocations();else if(s===2&&window.productsData.length===0)loadProducts();window.scrollTo({top:0,behavior:'smooth'});};
+        window.updateOrderSummary=()=>{const l=window.locationsData.find(x=>x.number==window.selectedLocation);if(l)document.getElementById('summaryLocation').textContent=`Tavolo ${l.number} - ${l.name}`;const si=document.getElementById('summaryItems');si.innerHTML='';let t=0;window.cart.forEach(i=>{const it=i.price*i.quantity;t+=it;const s=document.createElement('div');s.className='summary-item';s.innerHTML=`<span>${i.name} x ${i.quantity}</span><span>€${it.toFixed(2)}</span>`;si.appendChild(s);});document.getElementById('summaryTotal').textContent=`€${t.toFixed(2)}`;};
+        window.submitOrder=()=>{
+            const ni=document.getElementById('name'),
+                pi=document.getElementById('phone'),
+                di=document.getElementById('date'),
+                ti=document.getElementById('time'),
+                pei=document.getElementById('people'),
+                noi=document.getElementById('notes');
+            
+            if(!ni.value.trim()){showNotification('Inserisci nome','error');ni.focus();return;}
+            if(!pi.value.trim()){showNotification('Inserisci telefono','error');pi.focus();return;}
+            if(!di.value){showNotification('Seleziona una data','error');di.focus();return;}
+            if(!ti.value){showNotification('Seleziona un orario','error');ti.focus();return;}
+            
+            const oId=generateOrderId(),
+                l=window.locationsData.find(x=>x.number==window.selectedLocation),
+                o={
+                    id:oId,
+                    date:di.value,
+                    time:ti.value,
+                    customer:{name:ni.value.trim(),phone:pi.value.trim()},
+                    location:{number:window.selectedLocation,name:l?`Tavolo ${l.number} - ${l.name}`:`Tavolo ${window.selectedLocation}`},
+                    people:parseInt(pei.value),
+                    items:window.cart,
+                    notes:noi.value.trim(),
+                    status:'pending',
+                    total:window.cart.reduce((sm,i)=>sm+(i.price*i.quantity),0),
+                    created:new Date().toISOString()
+                };
+            
+            set(push(ref(database,'reservations')),o)
+                .then(()=>{
+                    document.getElementById('orderNumber').textContent=`Codice prenotazione: ${oId}`;
+                    document.getElementById('orderDateTime').textContent=`Data: ${new Date(di.value+'T'+ti.value).toLocaleString('it-IT')}`;
+                    goToStep(4);
+                    window.cart=[];
+                    updateCartCount();
+                })
+                .catch(e=>showNotification(`Errore: ${e.message}`,'error'));
+        };
+        
+        function generateOrderId(){
+            const d=new Date(),
+                y=d.getFullYear().toString().substr(-2),
+                m=('0'+(d.getMonth()+1)).slice(-2),
+                dt=('0'+d.getDate()).slice(-2),
+                r=Math.floor(Math.random()*1000).toString().padStart(3,'0');
+            return `RTL-${y}${m}${dt}-${r}`;
+        }
+        
+        window.startOver=()=>{
+            document.getElementById('name').value='';
+            document.getElementById('phone').value='';
+            document.getElementById('date').value='';
+            document.getElementById('time').value='';
+            document.getElementById('people').value='2';
+            document.getElementById('notes').value='';
+            window.selectedLocation=null;
+            window.cart=[];
+            updateCartCount();
+            goToStep(1);
+        };
+        
+        document.addEventListener('DOMContentLoaded',()=>{
+            // Imposta data predefinita a oggi
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('date').value = formattedDate;
+            
+            // Imposta ora predefinita alle 19:00
+            document.getElementById('time').value = '19:00';
+            
+            loadLocations();
+            
+            document.addEventListener('keydown',e=>{
+                if(e.key==='Escape'){
+                    const cm=document.getElementById('cartModal');
+                    if(cm.style.display==='flex')toggleCart();
+                }
+            });
+            
+            document.getElementById('cartModal').addEventListener('click',function(e){
+                if(e.target===this)toggleCart();
+            });
+        });
     </script>
 </body>
 </html>
